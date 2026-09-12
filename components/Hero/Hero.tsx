@@ -3,7 +3,7 @@ import { Button } from "@/components/Button/Button";
 import { CodeBlock } from "@/components/CodeBlock/CodeBlock";
 import styles from "./Hero.module.css";
 
-const LOADER_SNIPPET = `loadstring(game:HttpGet("https://symbios.app/loader"))()`;
+const LOADER_SNIPPET = `loadstring(game:HttpGet("https://raw.githubusercontent.com/SYMBIOSHUB/SYMBIOS-HUB/refs/heads/main/SYMBIOS.lua"))()`;
 
 export function Hero() {
   return (

@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { createClient as createBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
+import { HwidCell } from "@/components/HwidCell/HwidCell";
 import styles from "./panel.module.css";
 
 export type PanelKeyRow = {
@@ -150,7 +151,9 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
                 <td>
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
                 </td>
-                <td className={styles.mono}>{key.hwid ?? "—"}</td>
+                <td className={styles.mono}>
+                  <HwidCell hwid={key.hwid} />
+                </td>
                 <td className={styles.mono}>{resetsLeft}</td>
                 <td className={`${styles.mono} ${styles.time}`}>
                   {formatExpiry(key.expires_at)}

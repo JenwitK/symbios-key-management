@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
+import { HwidCell } from "@/components/HwidCell/HwidCell";
 import styles from "./keys.module.css";
 
 export type KeyStatus = "active" | "paused" | "banned" | "expired";
@@ -314,7 +315,9 @@ export function KeysManager({
                 <td>
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
                 </td>
-                <td className={styles.mono}>{key.hwid ?? "—"}</td>
+                <td className={styles.mono}>
+                  <HwidCell hwid={key.hwid} />
+                </td>
                 <td className={styles.mono}>
                   {key.hwid_resets}/{key.hwid_reset_limit}
                 </td>

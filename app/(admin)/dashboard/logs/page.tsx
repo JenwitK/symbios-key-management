@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge/Badge";
+import { HwidCell } from "@/components/HwidCell/HwidCell";
 import { createClient as createAdminClient } from "@/lib/supabase/admin";
 import styles from "./logs.module.css";
 
@@ -162,7 +163,9 @@ export default async function LogsPage({
               </td>
               <td className={styles.mono}>{log.keys?.key_value ?? "—"}</td>
               <td className={styles.mono}>{log.scripts?.name ?? "—"}</td>
-              <td className={styles.mono}>{log.hwid ?? "—"}</td>
+              <td className={styles.mono}>
+                <HwidCell hwid={log.hwid} />
+              </td>
               <td className={styles.mono}>{log.ip ?? "—"}</td>
             </tr>
           ))}

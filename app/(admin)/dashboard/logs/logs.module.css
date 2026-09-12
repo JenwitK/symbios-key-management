@@ -1,0 +1,140 @@
+.pageTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.pageSubtitle {
+  margin-top: var(--space-2);
+  color: var(--text-dim);
+  font-size: 0.9375rem;
+}
+
+.filters {
+  margin-top: var(--space-5);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.input {
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--text-mute);
+}
+
+.filterButton {
+  height: 38px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--text);
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filterButton:hover {
+  background: var(--text-dim);
+  border-color: var(--text-dim);
+}
+
+.table {
+  margin-top: var(--space-5);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-mute);
+  padding: var(--space-6) var(--space-3);
+}
+
+.pagination {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.pageStatus {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+}
+
+.pageLink {
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+}
+
+.pageLink:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.pageLinkDisabled {
+  font-size: 0.8125rem;
+  color: var(--text-mute);
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,32 @@
+.footer {
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-8);
+}
+
+.inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.wordmarkDim {
+  color: var(--text-dim);
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-mute);
+}

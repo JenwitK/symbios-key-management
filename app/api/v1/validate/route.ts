@@ -1,0 +1,181 @@
+import { z } from "zod";
+import { NextResponse, type NextRequest } from "next/server";
+import { createClient as createAdminClient } from "@/lib/supabase/admin";
+import { isRateLimited } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
+
+// Public, Lua-facing endpoint — no session, so it goes straight to the
+// service-role client. Do NOT put requireAdmin() on this route.
+
+const validateSchema = z.object({
+  key: z.string().trim().min(1).max(64),
+  hwid: z.string().trim().min(1).max(128),
+  script_slug: z.string().trim().min(1).max(200),
+});
+
+type ValidateReason =
+  | "invalid_key"
+  | "banned"
+  | "paused"
+  | "expired"
+  | "no_access"
+  | "hwid_mismatch";
+
+async function logAttempt(
+  adminClient: ReturnType<typeof createAdminClient>,
+  entry: {
+    keyId: string | null;
+    scriptId: string | null;
+    hwid: string;
+    ip: string | null;
+    result: ValidateReason | "ok";
+  },
+) {
+  await adminClient.from("validation_logs").insert({
+    key_id: entry.keyId,
+    script_id: entry.scriptId,
+    hwid: entry.hwid,
+    ip: entry.ip,
+    result: entry.result,
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+
+  if (isRateLimited(`validate:${ip ?? "unknown"}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
+  const body: unknown = await request.json().catch(() => null);
+  const parsed = validateSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+      { status: 400 },
+    );
+  }
+
+  const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
+  const adminClient = createAdminClient();
+
+  const { data: key } = await adminClient
+    .from("keys")
+    .select("id, status, hwid, expires_at")
+    .eq("key_value", keyValue)
+    .maybeSingle();
+
+  if (!key) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: null,
+      hwid,
+      ip,
+      result: "invalid_key",
+    });
+    return NextResponse.json({ success: false, reason: "invalid_key" });
+  }
+
+  // Time-based expiry always wins, regardless of whatever `status` holds —
+  // there's no cron flipping status to 'expired' when expires_at passes.
+  const isTimeExpired =
+    key.expires_at !== null && new Date(key.expires_at as string).getTime() < Date.now();
+
+  let reason: ValidateReason | null = null;
+
+  if (isTimeExpired || key.status === "expired") {
+    reason = "expired";
+  } else if (key.status === "banned") {
+    reason = "banned";
+  } else if (key.status === "paused") {
+    reason = "paused";
+  }
+
+  let script: { id: string; content: string | null } | null = null;
+
+  if (!reason) {
+    const { data: scriptRow } = await adminClient
+      .from("scripts")
+      .select("id, content")
+      .eq("slug", scriptSlug)
+      .maybeSingle();
+
+    if (!scriptRow) {
+      reason = "no_access";
+    } else {
+      const { data: access } = await adminClient
+        .from("key_scripts")
+        .select("key_id")
+        .eq("key_id", key.id as string)
+        .eq("script_id", scriptRow.id as string)
+        .maybeSingle();
+
+      if (!access) {
+        reason = "no_access";
+      } else {
+        script = scriptRow;
+      }
+    }
+  }
+
+  let hwidAlreadyWritten = false;
+
+  if (!reason && script) {
+    if (!key.hwid) {
+      // Compare-and-swap: only bind if hwid is STILL null at write time.
+      // Without the `.is("hwid", null)` guard, two devices racing on first
+      // use could both read hwid=null and both "win" an unconditional
+      // update, binding the same key to two machines.
+      const { data: bound } = await adminClient
+        .from("keys")
+        .update({
+          hwid,
+          last_seen_at: new Date().toISOString(),
+          last_ip: ip,
+        })
+        .eq("id", key.id as string)
+        .is("hwid", null)
+        .select("hwid")
+        .maybeSingle();
+
+      if (bound) {
+        hwidAlreadyWritten = true;
+      } else {
+        // Lost the race — someone else bound first. Re-read and compare.
+        const { data: current } = await adminClient
+          .from("keys")
+          .select("hwid")
+          .eq("id", key.id as string)
+          .maybeSingle();
+
+        if (current?.hwid !== hwid) {
+          reason = "hwid_mismatch";
+        }
+      }
+    } else if (key.hwid !== hwid) {
+      reason = "hwid_mismatch";
+    }
+  }
+
+  if (!hwidAlreadyWritten) {
+    await adminClient
+      .from("keys")
+      .update({ last_seen_at: new Date().toISOString(), last_ip: ip })
+      .eq("id", key.id as string);
+  }
+
+  await logAttempt(adminClient, {
+    keyId: key.id as string,
+    scriptId: script?.id ?? null,
+    hwid,
+    ip,
+    result: reason ?? "ok",
+  });
+
+  if (reason) {
+    return NextResponse.json({ success: false, reason });
+  }
+
+  return NextResponse.json({ success: true, script: script!.content });
+}

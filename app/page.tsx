@@ -1,69 +1,58 @@
-import Image from "next/image";
+import { Navbar } from "@/components/Navbar/Navbar";
+import { Hero } from "@/components/Hero/Hero";
+import { FeatureRow } from "@/components/FeatureRow/FeatureRow";
+import { Footer } from "@/components/Footer/Footer";
 import styles from "./page.module.css";
+
+const FEATURES = [
+  {
+    index: "01",
+    title: "HWID-locked keys",
+    description:
+      "A key binds to one machine on first use. Swap hardware and the key stops working until an HWID reset clears the lock.",
+  },
+  {
+    index: "02",
+    title: "Server-side whitelist",
+    description:
+      "The obfuscated script never ships with the loader. It stays on our server and is only returned after the key and HWID pass validation.",
+  },
+  {
+    index: "03",
+    title: "Anti-bypass redeem",
+    description:
+      "Free keys route through a server-to-server check against the link provider — the redirect URL and client-side flags are never trusted.",
+  },
+  {
+    index: "04",
+    title: "Instant script updates",
+    description:
+      "Push a new build once in the dashboard. Every key holder gets it on their next loadstring — no re-download, no version drift.",
+  },
+] as const;
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <section className={styles.features}>
+          <h2 className={styles.featuresTitle}>What gets enforced</h2>
+          <div className={styles.featuresList}>
+            {FEATURES.map((feature, i) => (
+              <FeatureRow
+                key={feature.index}
+                index={feature.index}
+                title={feature.title}
+                description={feature.description}
+                align={i % 2 === 0 ? "start" : "end"}
+              />
+            ))}
+          </div>
+        </section>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

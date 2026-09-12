@@ -1,0 +1,6 @@
+.loading {
+  padding: var(--space-6) 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-mute);
+}

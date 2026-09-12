@@ -42,3 +42,6 @@ next-env.d.ts
 
 # docs / planning files (not shipped)
 *.md
+
+# db migrations (contain schema/infra detail, not shipped)
+supabase/migrations/

@@ -27,6 +27,13 @@ const RESULT_TONE: Record<string, "ok" | "warn" | "err" | "neutral"> = {
   no_access: "warn",
 };
 
+type TopScript = {
+  script_id: string;
+  name: string;
+  slug: string;
+  executions: number;
+};
+
 type LogRow = {
   id: number;
   result: string;
@@ -88,10 +95,14 @@ export default async function LogsPage({
   }
 
   const offset = (page - 1) * PAGE_SIZE;
-  const [{ data, count }, { data: statsData }] = await Promise.all([
-    query.range(offset, offset + PAGE_SIZE - 1),
-    adminClient.rpc("execution_stats", { from_ts: fromTs, to_ts: toTs }),
-  ]);
+  const [{ data, count }, { data: statsData }, { data: topScriptsData }] =
+    await Promise.all([
+      query.range(offset, offset + PAGE_SIZE - 1),
+      adminClient.rpc("execution_stats", { from_ts: fromTs, to_ts: toTs }),
+      adminClient.rpc("top_scripts", { from_ts: fromTs, to_ts: toTs, lim: 10 }),
+    ]);
+
+  const topScripts = (topScriptsData ?? []) as unknown as TopScript[];
 
   const logs = (data ?? []) as unknown as LogRow[];
   const totalPages = count ? Math.max(1, Math.ceil(count / PAGE_SIZE)) : 1;
@@ -130,6 +141,28 @@ export default async function LogsPage({
           </div>
         ))}
       </div>
+
+      <section className={styles.topScripts}>
+        <h2 className={styles.sectionTitle}>Top scripts</h2>
+        {topScripts.length === 0 ? (
+          <div className={styles.topScriptsEmpty}>
+            No executions in this range yet.
+          </div>
+        ) : (
+          <ol className={styles.rankList}>
+            {topScripts.map((script, i) => (
+              <li key={script.script_id} className={styles.rankRow}>
+                <span className={styles.rankIndex}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className={styles.rankName}>{script.name}</span>
+                <span className={styles.rankSlug}>{script.slug}</span>
+                <span className={styles.rankCount}>{script.executions}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
 
       <form method="get" className={styles.filters}>
         <label className={styles.field}>

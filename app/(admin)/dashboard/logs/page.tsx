@@ -66,6 +66,9 @@ export default async function LogsPage({
   const to = typeof params.to === "string" ? params.to : "";
   const page = Math.max(1, Number(params.page) || 1);
 
+  const fromTs = from ? new Date(from).toISOString() : null;
+  const toTs = to ? new Date(`${to}T23:59:59.999`).toISOString() : null;
+
   const adminClient = createAdminClient();
   let query = adminClient
     .from("validation_logs")
@@ -77,19 +80,40 @@ export default async function LogsPage({
   if (result !== "all") {
     query = query.eq("result", result);
   }
-  if (from) {
-    query = query.gte("created_at", new Date(from).toISOString());
+  if (fromTs) {
+    query = query.gte("created_at", fromTs);
   }
-  if (to) {
-    query = query.lte("created_at", new Date(`${to}T23:59:59.999`).toISOString());
+  if (toTs) {
+    query = query.lte("created_at", toTs);
   }
 
   const offset = (page - 1) * PAGE_SIZE;
-  const { data, count } = await query.range(offset, offset + PAGE_SIZE - 1);
+  const [{ data, count }, { data: statsData }] = await Promise.all([
+    query.range(offset, offset + PAGE_SIZE - 1),
+    adminClient.rpc("execution_stats", { from_ts: fromTs, to_ts: toTs }),
+  ]);
 
   const logs = (data ?? []) as unknown as LogRow[];
   const totalPages = count ? Math.max(1, Math.ceil(count / PAGE_SIZE)) : 1;
   const currentQuery = { result, from, to, page: String(page) };
+
+  const executionStats = (statsData?.[0] ?? {
+    total_executions: 0,
+    unique_devices: 0,
+  }) as { total_executions: number; unique_devices: number };
+
+  const stats = [
+    {
+      label: "Executions",
+      value: executionStats.total_executions,
+      tone: "ok" as const,
+    },
+    {
+      label: "Unique devices",
+      value: executionStats.unique_devices,
+      tone: "neutral" as const,
+    },
+  ];
 
   return (
     <div>
@@ -97,6 +121,15 @@ export default async function LogsPage({
       <p className={styles.pageSubtitle}>
         Every /api/v1/validate attempt, most recent first.
       </p>
+
+      <div className={styles.statGrid}>
+        {stats.map((stat) => (
+          <div key={stat.label} className={styles.statCard}>
+            <Badge tone={stat.tone}>{stat.label}</Badge>
+            <span className={styles.statValue}>{stat.value}</span>
+          </div>
+        ))}
+      </div>
 
       <form method="get" className={styles.filters}>
         <label className={styles.field}>

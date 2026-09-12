@@ -128,10 +128,10 @@
     minmax(90px, 0.7fr)
     minmax(110px, 0.9fr)
     minmax(70px, 0.5fr)
-    minmax(150px, 1.1fr)
-    minmax(110px, 0.9fr)
+    minmax(190px, 1.1fr)
+    minmax(190px, 0.9fr)
     minmax(300px, 2fr);
-  min-width: 1070px;
+  min-width: 1230px;
   font-size: 0.875rem;
 }
 

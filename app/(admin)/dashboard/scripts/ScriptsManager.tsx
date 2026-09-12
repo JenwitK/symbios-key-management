@@ -192,34 +192,39 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
         </form>
       ) : null}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Status</th>
-            <th>Size</th>
-            <th>Version</th>
-            <th>Updated</th>
-            <th aria-label="Actions" />
-          </tr>
-        </thead>
-        <tbody>
+      <div className={styles.tableWrap}>
+        <div className={styles.table}>
+          <div className={styles.row}>
+            <div className={styles.headerCell}>Name</div>
+            <div className={styles.headerCell}>Slug</div>
+            <div className={styles.headerCell}>Status</div>
+            <div className={styles.headerCell}>Size</div>
+            <div className={styles.headerCell}>Version</div>
+            <div className={styles.headerCell}>Updated</div>
+            <div className={styles.headerCell} aria-label="Actions" />
+          </div>
+
           {scripts.map((script) => (
-            <tr key={script.id}>
-              <td>{script.name}</td>
-              <td className={styles.mono}>{script.slug}</td>
-              <td>
+            <div key={script.id} className={styles.row}>
+              <div className={styles.cell}>{script.name}</div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {script.slug}
+              </div>
+              <div className={styles.cell}>
                 <Badge tone={script.status === "active" ? "ok" : "neutral"}>
                   {script.status}
                 </Badge>
-              </td>
-              <td className={styles.mono}>{formatBytes(script.content)}</td>
-              <td className={styles.mono}>v{script.version}</td>
-              <td className={`${styles.mono} ${styles.time}`}>
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {formatBytes(script.content)}
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                v{script.version}
+              </div>
+              <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                 {formatDate(script.updated_at)}
-              </td>
-              <td className={styles.rowActions}>
+              </div>
+              <div className={styles.actionsCell}>
                 <button
                   type="button"
                   className={styles.linkButton}
@@ -238,18 +243,15 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
                 >
                   Delete
                 </button>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))}
+
           {scripts.length === 0 ? (
-            <tr>
-              <td colSpan={7} className={styles.empty}>
-                No scripts yet.
-              </td>
-            </tr>
+            <div className={styles.empty}>No scripts yet.</div>
           ) : null}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 }

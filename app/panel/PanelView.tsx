@@ -128,37 +128,40 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
 
       {resetError ? <p className={styles.error}>{resetError}</p> : null}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Status</th>
-            <th>HWID</th>
-            <th>Resets left</th>
-            <th>Expires</th>
-            <th aria-label="Actions" />
-          </tr>
-        </thead>
-        <tbody>
+      <div className={styles.tableWrap}>
+        <div className={styles.table}>
+          <div className={styles.row}>
+            <div className={styles.headerCell}>Key</div>
+            <div className={styles.headerCell}>Status</div>
+            <div className={styles.headerCell}>HWID</div>
+            <div className={styles.headerCell}>Resets left</div>
+            <div className={styles.headerCell}>Expires</div>
+            <div className={styles.headerCell} aria-label="Actions" />
+          </div>
+
           {keys.map((key) => {
             const resetsLeft = Math.max(
               key.hwid_reset_limit - key.hwid_resets,
               0,
             );
             return (
-              <tr key={key.id}>
-                <td className={styles.mono}>{key.key_value}</td>
-                <td>
+              <div key={key.id} className={styles.row}>
+                <div className={`${styles.cell} ${styles.mono}`}>
+                  {key.key_value}
+                </div>
+                <div className={styles.cell}>
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
-                </td>
-                <td className={styles.mono}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono}`}>
                   <HwidCell hwid={key.hwid} />
-                </td>
-                <td className={styles.mono}>{resetsLeft}</td>
-                <td className={`${styles.mono} ${styles.time}`}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono}`}>
+                  {resetsLeft}
+                </div>
+                <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                   {formatExpiry(key.expires_at)}
-                </td>
-                <td>
+                </div>
+                <div className={styles.cell}>
                   <button
                     type="button"
                     className={styles.linkButton}
@@ -169,19 +172,18 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
                   >
                     Reset HWID
                   </button>
-                </td>
-              </tr>
+                </div>
+              </div>
             );
           })}
+
           {keys.length === 0 ? (
-            <tr>
-              <td colSpan={6} className={styles.empty}>
-                No keys linked yet — link one above.
-              </td>
-            </tr>
+            <div className={styles.empty}>
+              No keys linked yet — link one above.
+            </div>
           ) : null}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 }

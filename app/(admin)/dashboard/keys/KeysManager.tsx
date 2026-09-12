@@ -292,42 +292,43 @@ export function KeysManager({
         </select>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Label</th>
-            <th>Status</th>
-            <th>HWID</th>
-            <th>Resets</th>
-            <th>Last seen</th>
-            <th>Expires</th>
-            <th aria-label="Actions" />
-          </tr>
-        </thead>
-        <tbody>
+      <div className={styles.tableWrap}>
+        <div className={styles.table}>
+          <div className={styles.row}>
+            <div className={styles.headerCell}>Key</div>
+            <div className={styles.headerCell}>Label</div>
+            <div className={styles.headerCell}>Status</div>
+            <div className={styles.headerCell}>HWID</div>
+            <div className={styles.headerCell}>Resets</div>
+            <div className={styles.headerCell}>Last seen</div>
+            <div className={styles.headerCell}>Expires</div>
+            <div className={styles.headerCell} aria-label="Actions" />
+          </div>
+
           {visibleKeys.map((key) => {
             const busy = pendingActionId === key.id;
             return (
-              <tr key={key.id}>
-                <td className={styles.mono}>{key.key_value}</td>
-                <td>{key.label || "—"}</td>
-                <td>
+              <div key={key.id} className={styles.row}>
+                <div className={`${styles.cell} ${styles.mono}`}>
+                  {key.key_value}
+                </div>
+                <div className={styles.cell}>{key.label || "—"}</div>
+                <div className={styles.cell}>
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
-                </td>
-                <td className={styles.mono}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono}`}>
                   <HwidCell hwid={key.hwid} />
-                </td>
-                <td className={styles.mono}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono}`}>
                   {key.hwid_resets}/{key.hwid_reset_limit}
-                </td>
-                <td className={`${styles.mono} ${styles.time}`}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                   {formatDate(key.last_seen_at)}
-                </td>
-                <td className={`${styles.mono} ${styles.time}`}>
+                </div>
+                <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                   {key.expires_at ? formatDate(key.expires_at) : "Lifetime"}
-                </td>
-                <td className={styles.rowActions}>
+                </div>
+                <div className={styles.actionsCell}>
                   <button
                     type="button"
                     className={styles.linkButton}
@@ -381,19 +382,16 @@ export function KeysManager({
                   >
                     Delete
                   </button>
-                </td>
-              </tr>
+                </div>
+              </div>
             );
           })}
+
           {visibleKeys.length === 0 ? (
-            <tr>
-              <td colSpan={8} className={styles.empty}>
-                No keys match this filter.
-              </td>
-            </tr>
+            <div className={styles.empty}>No keys match this filter.</div>
           ) : null}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </div>
   );
 }

@@ -113,15 +113,27 @@
   width: auto;
 }
 
-.table {
+.tableWrap {
   margin-top: var(--space-4);
-  width: 100%;
-  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+.table {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.3fr)
+    minmax(90px, 1fr)
+    minmax(90px, 0.7fr)
+    minmax(110px, 0.9fr)
+    minmax(70px, 0.5fr)
+    minmax(150px, 1.1fr)
+    minmax(110px, 0.9fr)
+    minmax(300px, 2fr);
+  min-width: 1070px;
   font-size: 0.875rem;
 }
 
-.table th {
-  text-align: left;
+.headerCell {
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
   color: var(--text-mute);
@@ -132,30 +144,37 @@
   letter-spacing: 0.04em;
 }
 
-.table td {
+.row {
+  display: contents;
+}
+
+.cell {
   padding: var(--space-3);
   border-bottom: 1px solid var(--border);
   color: var(--text);
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .mono {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--text-dim);
-  max-width: 220px;
   overflow-wrap: anywhere;
 }
 
 .time {
-  max-width: none;
   white-space: nowrap;
 }
 
-.rowActions {
+.actionsCell {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-3);
-  white-space: nowrap;
 }
 
 .linkButton {
@@ -180,6 +199,7 @@
 }
 
 .empty {
+  grid-column: 1 / -1;
   text-align: center;
   color: var(--text-mute);
   padding: var(--space-6) var(--space-3);
@@ -188,10 +208,5 @@
 @media (max-width: 720px) {
   .formRow {
     grid-template-columns: 1fr;
-  }
-
-  .table {
-    overflow-x: auto;
-    display: block;
   }
 }

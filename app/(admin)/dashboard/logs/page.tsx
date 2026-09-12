@@ -139,45 +139,49 @@ export default async function LogsPage({
         </button>
       </form>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Result</th>
-            <th>Key</th>
-            <th>Script</th>
-            <th>HWID</th>
-            <th>IP</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className={styles.tableWrap}>
+        <div className={styles.table}>
+          <div className={styles.row}>
+            <div className={styles.headerCell}>Time</div>
+            <div className={styles.headerCell}>Result</div>
+            <div className={styles.headerCell}>Key</div>
+            <div className={styles.headerCell}>Script</div>
+            <div className={styles.headerCell}>HWID</div>
+            <div className={styles.headerCell}>IP</div>
+          </div>
+
           {logs.map((log) => (
-            <tr key={log.id}>
-              <td className={`${styles.mono} ${styles.time}`}>
+            <div key={log.id} className={styles.row}>
+              <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                 {formatDateTime(log.created_at)}
-              </td>
-              <td>
+              </div>
+              <div className={styles.cell}>
                 <Badge tone={RESULT_TONE[log.result] ?? "neutral"}>
                   {log.result}
                 </Badge>
-              </td>
-              <td className={styles.mono}>{log.keys?.key_value ?? "—"}</td>
-              <td className={styles.mono}>{log.scripts?.name ?? "—"}</td>
-              <td className={styles.mono}>
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {log.keys?.key_value ?? "—"}
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {log.scripts?.name ?? "—"}
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
                 <HwidCell hwid={log.hwid} />
-              </td>
-              <td className={styles.mono}>{log.ip ?? "—"}</td>
-            </tr>
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {log.ip ?? "—"}
+              </div>
+            </div>
           ))}
+
           {logs.length === 0 ? (
-            <tr>
-              <td colSpan={6} className={styles.empty}>
-                No log entries match these filters.
-              </td>
-            </tr>
+            <div className={styles.empty}>
+              No log entries match these filters.
+            </div>
           ) : null}
-        </tbody>
-      </table>
+        </div>
+      </div>
 
       <div className={styles.pagination}>
         <Link

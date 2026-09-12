@@ -8,32 +8,16 @@ import styles from "./settings.module.css";
 type SettingsFormProps = {
   initialKeyPrefix: string;
   initialDefaultResetLimit: number;
-  initialProviders: Record<string, { enabled?: boolean }>;
-  providerIds: string[];
 };
 
 export function SettingsForm({
   initialKeyPrefix,
   initialDefaultResetLimit,
-  initialProviders,
-  providerIds,
 }: SettingsFormProps) {
   const router = useRouter();
-  const [enabledProviders, setEnabledProviders] = useState<
-    Record<string, boolean>
-  >(() =>
-    Object.fromEntries(
-      providerIds.map((id) => [id, Boolean(initialProviders[id]?.enabled)]),
-    ),
-  );
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function toggleProvider(id: string) {
-    setEnabledProviders((current) => ({ ...current, [id]: !current[id] }));
-    setSaved(false);
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,10 +29,6 @@ export function SettingsForm({
     const keyPrefix = (formData.get("key_prefix") as string).trim();
     const defaultResetLimit = Number(formData.get("default_reset_limit"));
 
-    const providers = Object.fromEntries(
-      providerIds.map((id) => [id, { enabled: Boolean(enabledProviders[id]) }]),
-    );
-
     try {
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
@@ -58,7 +38,6 @@ export function SettingsForm({
           default_reset_limit: Number.isFinite(defaultResetLimit)
             ? defaultResetLimit
             : undefined,
-          providers,
         }),
       });
 
@@ -102,24 +81,6 @@ export function SettingsForm({
           />
         </label>
       </div>
-
-      <fieldset className={styles.providersField}>
-        <legend className={styles.label}>Redeem providers</legend>
-        {providerIds.length === 0 ? (
-          <p className={styles.pageSubtitle}>No providers registered.</p>
-        ) : (
-          providerIds.map((id) => (
-            <label key={id} className={styles.providerOption}>
-              <input
-                type="checkbox"
-                checked={Boolean(enabledProviders[id])}
-                onChange={() => toggleProvider(id)}
-              />
-              {id}
-            </label>
-          ))
-        )}
-      </fieldset>
 
       {error ? <p className={styles.error}>{error}</p> : null}
       {saved ? <p className={styles.saved}>Saved.</p> : null}

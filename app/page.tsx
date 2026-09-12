@@ -19,9 +19,9 @@ const FEATURES = [
   },
   {
     index: "03",
-    title: "Anti-bypass redeem",
+    title: "Self-service panel",
     description:
-      "Free keys route through a server-to-server check against the link provider — the redirect URL and client-side flags are never trusted.",
+      "Buyers link their key to a Discord account and reset their own HWID — no waiting on an admin for routine changes.",
   },
   {
     index: "04",

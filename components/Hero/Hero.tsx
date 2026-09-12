@@ -20,10 +20,7 @@ export function Hero() {
           no code — the loader gets nothing back.
         </p>
         <div className={styles.actions}>
-          <Button href="/get-key">Get a key</Button>
-          <Button href="/panel" variant="ghost">
-            Manage key
-          </Button>
+          <Button href="/panel">Manage key</Button>
         </div>
       </div>
 

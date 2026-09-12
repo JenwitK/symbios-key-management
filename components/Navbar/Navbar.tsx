@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { KeyRound } from "lucide-react";
-import { Button } from "@/components/Button/Button";
 import styles from "./Navbar.module.css";
 
 export function Navbar() {
@@ -24,8 +23,6 @@ export function Navbar() {
             Panel
           </Link>
         </nav>
-
-        <Button href="/get-key">Get Key</Button>
       </div>
     </header>
   );

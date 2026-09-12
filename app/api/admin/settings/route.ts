@@ -11,7 +11,6 @@ const updateSettingsSchema = z.object({
     .regex(/^[A-Za-z0-9_-]+$/, "key_prefix must be letters, numbers, _ or -")
     .optional(),
   default_reset_limit: z.number().int().min(0).max(999).optional(),
-  providers: z.record(z.string(), z.object({ enabled: z.boolean() })).optional(),
 });
 
 export async function PATCH(request: NextRequest) {

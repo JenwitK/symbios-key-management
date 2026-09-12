@@ -152,7 +152,9 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
                 </td>
                 <td className={styles.mono}>{key.hwid ?? "—"}</td>
                 <td className={styles.mono}>{resetsLeft}</td>
-                <td className={styles.mono}>{formatExpiry(key.expires_at)}</td>
+                <td className={`${styles.mono} ${styles.time}`}>
+                  {formatExpiry(key.expires_at)}
+                </td>
                 <td>
                   <button
                     type="button"

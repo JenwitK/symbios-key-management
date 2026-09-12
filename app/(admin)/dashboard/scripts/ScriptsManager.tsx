@@ -216,7 +216,9 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
               </td>
               <td className={styles.mono}>{formatBytes(script.content)}</td>
               <td className={styles.mono}>v{script.version}</td>
-              <td className={styles.mono}>{formatDate(script.updated_at)}</td>
+              <td className={`${styles.mono} ${styles.time}`}>
+                {formatDate(script.updated_at)}
+              </td>
               <td className={styles.rowActions}>
                 <button
                   type="button"

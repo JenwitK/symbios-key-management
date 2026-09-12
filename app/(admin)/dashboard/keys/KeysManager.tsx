@@ -318,8 +318,10 @@ export function KeysManager({
                 <td className={styles.mono}>
                   {key.hwid_resets}/{key.hwid_reset_limit}
                 </td>
-                <td className={styles.mono}>{formatDate(key.last_seen_at)}</td>
-                <td className={styles.mono}>
+                <td className={`${styles.mono} ${styles.time}`}>
+                  {formatDate(key.last_seen_at)}
+                </td>
+                <td className={`${styles.mono} ${styles.time}`}>
                   {key.expires_at ? formatDate(key.expires_at) : "Lifetime"}
                 </td>
                 <td className={styles.rowActions}>

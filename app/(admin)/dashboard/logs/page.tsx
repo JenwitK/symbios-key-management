@@ -152,7 +152,9 @@ export default async function LogsPage({
         <tbody>
           {logs.map((log) => (
             <tr key={log.id}>
-              <td className={styles.mono}>{formatDateTime(log.created_at)}</td>
+              <td className={`${styles.mono} ${styles.time}`}>
+                {formatDateTime(log.created_at)}
+              </td>
               <td>
                 <Badge tone={RESULT_TONE[log.result] ?? "neutral"}>
                   {log.result}

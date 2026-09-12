@@ -116,6 +116,13 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--text-dim);
+  max-width: 220px;
+  overflow-wrap: anywhere;
+}
+
+.time {
+  max-width: none;
+  white-space: nowrap;
 }
 
 .rowActions {

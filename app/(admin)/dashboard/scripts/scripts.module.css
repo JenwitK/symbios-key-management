@@ -50,6 +50,8 @@
 
 .input,
 .textarea {
+  width: 100%;
+  min-width: 0;
   padding: 0 var(--space-3);
   height: 38px;
   border: 1px solid var(--border);

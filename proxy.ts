@@ -25,11 +25,19 @@ export async function proxy(request: NextRequest) {
     },
   );
 
+  // Touching getUser() refreshes an expired access token and persists the
+  // rotated cookies via the response above. Server Components can't do this
+  // themselves (Next.js disallows setting cookies there — see
+  // lib/supabase/server.ts), so every route that reads the session in a
+  // Server Component needs to be covered by the matcher below, or its
+  // session silently breaks the first time the access token expires (the
+  // rotated refresh token gets used but never written back to the browser,
+  // so the next visit signs the user out).
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -39,5 +47,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  // /dashboard/* additionally redirects to /login when logged out (admin
+  // auth); /panel just needs its session kept fresh — it shows its own
+  // inline Discord sign-in when logged out, never redirects.
+  matcher: ["/dashboard/:path*", "/panel"],
 };

@@ -7,6 +7,10 @@ const linkKeySchema = z.object({
   key_value: z.string().trim().min(1).max(64),
 });
 
+const unlinkKeySchema = z.object({
+  key_id: z.string().uuid(),
+});
+
 export async function POST(request: NextRequest) {
   const auth = await requireUser();
   if (!auth.authorized) return auth.response;
@@ -61,4 +65,37 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true, key: linked });
+}
+
+export async function DELETE(request: NextRequest) {
+  const auth = await requireUser();
+  if (!auth.authorized) return auth.response;
+
+  const body: unknown = await request.json().catch(() => null);
+  const parsed = unlinkKeySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "key_id is required" }, { status: 400 });
+  }
+
+  const adminClient = createAdminClient();
+
+  // Only unlink if it's still ours — same 404 whether it's someone else's
+  // key or doesn't exist, so we don't leak which.
+  const { data: unlinked, error } = await adminClient
+    .from("keys")
+    .update({ discord_id: null })
+    .eq("id", parsed.data.key_id)
+    .eq("discord_id", auth.discordId)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!unlinked) {
+    return NextResponse.json({ error: "Key not found." }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true, key: unlinked });
 }

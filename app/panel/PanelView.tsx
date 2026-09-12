@@ -40,6 +40,7 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
   const [isLinking, setIsLinking] = useState(false);
   const [pendingResetId, setPendingResetId] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
+  const [pendingUnlinkId, setPendingUnlinkId] = useState<string | null>(null);
 
   async function handleSignOut() {
     const supabase = createBrowserClient();
@@ -71,6 +72,36 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
       router.refresh();
     } finally {
       setIsLinking(false);
+    }
+  }
+
+  async function handleUnlink(key: PanelKeyRow) {
+    if (
+      !window.confirm(
+        `Unlink "${key.key_value}" from this account? You can re-link it later with the key.`,
+      )
+    ) {
+      return;
+    }
+
+    setResetError(null);
+    setPendingUnlinkId(key.id);
+    try {
+      const res = await fetch("/api/panel/link-key", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key_id: key.id }),
+      });
+      const json: { error?: string } = await res.json();
+
+      if (!res.ok) {
+        setResetError(json.error ?? "Could not unlink key.");
+        return;
+      }
+
+      router.refresh();
+    } finally {
+      setPendingUnlinkId(null);
     }
   }
 
@@ -161,7 +192,7 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
                 <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
                   {formatExpiry(key.expires_at)}
                 </div>
-                <div className={styles.cell}>
+                <div className={styles.actionsCell}>
                   <button
                     type="button"
                     className={styles.linkButton}
@@ -171,6 +202,14 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
                     onClick={() => handleResetHwid(key.id)}
                   >
                     Reset HWID
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.linkButton}
+                    disabled={pendingUnlinkId === key.id}
+                    onClick={() => handleUnlink(key)}
+                  >
+                    Unlink
                   </button>
                 </div>
               </div>

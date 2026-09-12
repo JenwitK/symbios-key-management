@@ -8,7 +8,7 @@ import { getClientIp } from "@/lib/request-ip";
 // service-role client. Do NOT put requireAdmin() on this route.
 
 const validateSchema = z.object({
-  key: z.string().trim().min(1).max(64),
+  key: z.string().trim().min(1).max(64).optional(),
   hwid: z.string().trim().min(1).max(128),
   script_slug: z.string().trim().min(1).max(200),
 });
@@ -19,7 +19,8 @@ type ValidateReason =
   | "paused"
   | "expired"
   | "no_access"
-  | "hwid_mismatch";
+  | "hwid_mismatch"
+  | "key_required";
 
 async function logAttempt(
   adminClient: ReturnType<typeof createAdminClient>,
@@ -60,6 +61,34 @@ export async function POST(request: NextRequest) {
   const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
   const adminClient = createAdminClient();
 
+  const { data: scriptRow } = await adminClient
+    .from("scripts")
+    .select("id, content, keyless")
+    .eq("slug", scriptSlug)
+    .maybeSingle();
+
+  if (scriptRow?.keyless === true) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: scriptRow.id as string,
+      hwid,
+      ip,
+      result: "ok",
+    });
+    return NextResponse.json({ success: true, script: scriptRow.content });
+  }
+
+  if (!keyValue) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: scriptRow?.id ?? null,
+      hwid,
+      ip,
+      result: "key_required",
+    });
+    return NextResponse.json({ success: false, reason: "key_required" });
+  }
+
   const { data: key } = await adminClient
     .from("keys")
     .select("id, status, hwid, expires_at")
@@ -69,7 +98,7 @@ export async function POST(request: NextRequest) {
   if (!key) {
     await logAttempt(adminClient, {
       keyId: null,
-      scriptId: null,
+      scriptId: scriptRow?.id ?? null,
       hwid,
       ip,
       result: "invalid_key",
@@ -95,12 +124,6 @@ export async function POST(request: NextRequest) {
   let script: { id: string; content: string | null } | null = null;
 
   if (!reason) {
-    const { data: scriptRow } = await adminClient
-      .from("scripts")
-      .select("id, content")
-      .eq("slug", scriptSlug)
-      .maybeSingle();
-
     if (!scriptRow) {
       reason = "no_access";
     } else {

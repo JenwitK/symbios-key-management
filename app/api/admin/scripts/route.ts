@@ -11,6 +11,7 @@ const createSchema = z.object({
   source_content: z.string().optional(),
   obf_config: z.record(z.string(), z.unknown()).optional(),
   status: z.enum(["active", "disabled"]).default("active"),
+  keyless: z.boolean().optional(),
 });
 
 const updateSchema = z.object({
@@ -21,6 +22,7 @@ const updateSchema = z.object({
   source_content: z.string().optional(),
   obf_config: z.record(z.string(), z.unknown()).optional(),
   status: z.enum(["active", "disabled"]).optional(),
+  keyless: z.boolean().optional(),
 });
 
 const deleteSchema = z.object({
@@ -60,6 +62,7 @@ export async function POST(request: NextRequest) {
       source_content: parsed.data.source_content ?? null,
       obf_config: parsed.data.obf_config ?? null,
       status: parsed.data.status,
+      keyless: parsed.data.keyless ?? false,
     })
     .select()
     .single();

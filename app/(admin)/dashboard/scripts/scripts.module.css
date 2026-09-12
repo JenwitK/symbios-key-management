@@ -98,12 +98,12 @@
   grid-template-columns:
     minmax(160px, 1.6fr)
     minmax(110px, 1fr)
-    minmax(90px, 0.7fr)
+    minmax(150px, 0.9fr)
     minmax(80px, 0.6fr)
     minmax(70px, 0.5fr)
     minmax(190px, 1.1fr)
     minmax(120px, 0.8fr);
-  min-width: 820px;
+  min-width: 880px;
   font-size: 0.875rem;
 }
 
@@ -128,7 +128,18 @@
   color: var(--text);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   min-width: 0;
+}
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text);
 }
 
 .mono {

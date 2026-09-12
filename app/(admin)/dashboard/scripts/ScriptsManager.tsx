@@ -13,6 +13,7 @@ export type ScriptRow = {
   content: string | null;
   version: number;
   status: "active" | "disabled";
+  keyless: boolean;
   updated_at: string;
 };
 
@@ -60,6 +61,7 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
       slug: formData.get("slug"),
       content: formData.get("content"),
       status: formData.get("status"),
+      keyless: formData.get("keyless") === "on",
     };
 
     try {
@@ -162,6 +164,15 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
             </label>
           </div>
 
+          <label className={styles.checkboxField}>
+            <input
+              type="checkbox"
+              name="keyless"
+              defaultChecked={editing?.keyless ?? false}
+            />
+            Keyless — no key required
+          </label>
+
           <label className={styles.field}>
             <span className={styles.label}>
               Content (obfuscated — paste MoonVeil output)
@@ -214,6 +225,9 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
                 <Badge tone={script.status === "active" ? "ok" : "neutral"}>
                   {script.status}
                 </Badge>
+                {script.keyless ? (
+                  <Badge tone="neutral">keyless</Badge>
+                ) : null}
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
                 {formatBytes(script.content)}

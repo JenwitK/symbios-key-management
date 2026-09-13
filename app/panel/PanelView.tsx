@@ -208,134 +208,140 @@ export function PanelView({ keys, scriptsByKey, announcements }: PanelViewProps)
         </div>
       ) : null}
 
-      <section className={styles.howto}>
-        <h2 className={styles.sectionTitle}>How to use your key</h2>
-        <ol className={styles.steps}>
-          <li>Copy the loader below.</li>
-          <li>Paste it into your executor and run it.</li>
-          <li>Enter your key when prompted (keyless scripts just run).</li>
-        </ol>
-        <CodeBlock filename="symbios-loader.lua" code={LOADER} />
-      </section>
-
-      {announcements.length > 0 ? (
-        <section className={styles.news}>
-          <h2 className={styles.sectionTitle}>News</h2>
-          <div className={styles.newsList}>
-            {announcements.map((item, index) => (
-              <div key={index} className={styles.newsCard}>
-                <div className={styles.newsHeader}>
-                  {item.tag ? <Badge tone="neutral">{item.tag}</Badge> : null}
-                  <span className={styles.newsTitle}>{item.title}</span>
-                </div>
-                <p className={styles.newsBody}>{item.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <form onSubmit={handleLink} className={styles.linkForm}>
-        <label className={styles.field}>
-          <span className={styles.label}>Link a key to this account</span>
-          <input
-            value={linkValue}
-            onChange={(event) => setLinkValue(event.target.value)}
-            type="text"
-            placeholder="SYMBIOS-XXXX-XXXX-XXXX"
-            className={styles.input}
-          />
-        </label>
-        {linkError ? <p className={styles.error}>{linkError}</p> : null}
-        <Button type="submit" disabled={isLinking}>
-          {isLinking ? "Linking…" : "Link key"}
-        </Button>
-      </form>
-
-      {resetError ? <p className={styles.error}>{resetError}</p> : null}
-
-      <div className={styles.cardsWrap}>
-        {keys.map((key) => {
-          const resetsLeft = Math.max(key.hwid_reset_limit - key.hwid_resets, 0);
-          const countdown = expiryCountdown(key.expires_at);
-          const scripts = scriptsByKey[key.id] ?? [];
-
-          return (
-            <div key={key.id} className={styles.keyCard}>
-              <div className={styles.keyCardHeader}>
-                <div className={styles.keyValueRow}>
-                  <span className={styles.keyValue}>{key.key_value}</span>
-                  <button
-                    type="button"
-                    className={styles.copyButton}
-                    onClick={() => handleCopyKey(key)}
-                  >
-                    {copiedId === key.id ? "Copied" : "Copy"}
-                  </button>
-                </div>
-                <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
-              </div>
-
-              <div className={styles.keyCardBody}>
-                <div className={styles.keyStat}>
-                  <span className={styles.keyStatLabel}>HWID</span>
-                  <span className={styles.mono}>
-                    <HwidCell hwid={key.hwid} />
-                  </span>
-                </div>
-                <div className={styles.keyStat}>
-                  <span className={styles.keyStatLabel}>Resets left</span>
-                  <span className={styles.mono}>{resetsLeft}</span>
-                </div>
-                <div className={styles.keyStat}>
-                  <span className={styles.keyStatLabel}>Expires</span>
-                  <span className={styles.mono}>
-                    {formatExpiry(key.expires_at)}
-                    {countdown ? ` (${countdown})` : ""}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.scriptAccess}>
-                <span className={styles.keyStatLabel}>Script access</span>
-                {scripts.length > 0 ? (
-                  <div className={styles.chipRow}>
-                    {scripts.map((script) => (
-                      <span key={script.slug} className={styles.chip}>
-                        {script.name}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className={styles.muted}>No scripts</span>
-                )}
-              </div>
-
-              <div className={styles.keyCardActions}>
-                <button
-                  type="button"
-                  className={styles.linkButton}
-                  disabled={pendingResetId === key.id || !key.hwid || resetsLeft <= 0}
-                  onClick={() => handleResetHwid(key.id)}
-                >
-                  Reset HWID
-                </button>
-                <button
-                  type="button"
-                  className={styles.linkButton}
-                  disabled={pendingUnlinkId === key.id}
-                  onClick={() => handleUnlink(key)}
-                >
-                  Unlink
-                </button>
-              </div>
+      <div className={styles.mainGrid}>
+        <div className={styles.main}>
+          <form onSubmit={handleLink} className={styles.linkForm}>
+            <span className={styles.label}>Link a key to this account</span>
+            <div className={styles.linkRow}>
+              <input
+                value={linkValue}
+                onChange={(event) => setLinkValue(event.target.value)}
+                type="text"
+                placeholder="SYMBIOS-XXXX-XXXX-XXXX"
+                className={styles.input}
+              />
+              <Button type="submit" disabled={isLinking}>
+                {isLinking ? "Linking…" : "Link key"}
+              </Button>
             </div>
-          );
-        })}
+            {linkError ? <p className={styles.error}>{linkError}</p> : null}
+          </form>
 
-        {keys.length === 0 ? (
-          <div className={styles.empty}>No keys linked yet. Link one above.</div>
-        ) : null}
+          {resetError ? <p className={styles.error}>{resetError}</p> : null}
+
+          <div className={styles.cardsWrap}>
+            {keys.map((key) => {
+              const resetsLeft = Math.max(key.hwid_reset_limit - key.hwid_resets, 0);
+              const countdown = expiryCountdown(key.expires_at);
+              const scripts = scriptsByKey[key.id] ?? [];
+
+              return (
+                <div key={key.id} className={styles.keyCard}>
+                  <div className={styles.keyCardHeader}>
+                    <div className={styles.keyValueRow}>
+                      <span className={styles.keyValue}>{key.key_value}</span>
+                      <button
+                        type="button"
+                        className={styles.copyButton}
+                        onClick={() => handleCopyKey(key)}
+                      >
+                        {copiedId === key.id ? "Copied" : "Copy"}
+                      </button>
+                    </div>
+                    <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
+                  </div>
+
+                  <div className={styles.keyCardBody}>
+                    <div className={styles.keyStat}>
+                      <span className={styles.keyStatLabel}>HWID</span>
+                      <span className={styles.mono}>
+                        <HwidCell hwid={key.hwid} />
+                      </span>
+                    </div>
+                    <div className={styles.keyStat}>
+                      <span className={styles.keyStatLabel}>Resets left</span>
+                      <span className={styles.mono}>{resetsLeft}</span>
+                    </div>
+                    <div className={styles.keyStat}>
+                      <span className={styles.keyStatLabel}>Expires</span>
+                      <span className={styles.mono}>
+                        {formatExpiry(key.expires_at)}
+                        {countdown ? ` (${countdown})` : ""}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.scriptAccess}>
+                    <span className={styles.keyStatLabel}>Script access</span>
+                    {scripts.length > 0 ? (
+                      <div className={styles.chipRow}>
+                        {scripts.map((script) => (
+                          <span key={script.slug} className={styles.chip}>
+                            {script.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className={styles.muted}>No scripts</span>
+                    )}
+                  </div>
+
+                  <div className={styles.keyCardActions}>
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      disabled={pendingResetId === key.id || !key.hwid || resetsLeft <= 0}
+                      onClick={() => handleResetHwid(key.id)}
+                    >
+                      Reset HWID
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      disabled={pendingUnlinkId === key.id}
+                      onClick={() => handleUnlink(key)}
+                    >
+                      Unlink
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {keys.length === 0 ? (
+              <div className={styles.empty}>No keys linked yet. Link one above.</div>
+            ) : null}
+          </div>
+        </div>
+
+        <aside className={styles.aside}>
+          <section className={styles.howto}>
+            <h2 className={styles.sectionTitle}>How to use your key</h2>
+            <ol className={styles.steps}>
+              <li>Copy the loader below.</li>
+              <li>Paste it into your executor and run it.</li>
+              <li>Enter your key when prompted (keyless scripts just run).</li>
+            </ol>
+            <CodeBlock filename="symbios-loader.lua" code={LOADER} />
+          </section>
+
+          {announcements.length > 0 ? (
+            <section className={styles.news}>
+              <h2 className={styles.sectionTitle}>News</h2>
+              <div className={styles.newsList}>
+                {announcements.map((item, index) => (
+                  <div key={index} className={styles.newsCard}>
+                    <div className={styles.newsHeader}>
+                      {item.tag ? <Badge tone="neutral">{item.tag}</Badge> : null}
+                      <span className={styles.newsTitle}>{item.title}</span>
+                    </div>
+                    <p className={styles.newsBody}>{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </aside>
       </div>
     </div>
   );

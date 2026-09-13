@@ -1,0 +1,197 @@
+<title>SYMBIOS Panel Layout</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --surface:#141416; --surface-2:#1c1c1f;
+    --border:rgba(255,255,255,.08); --text:#fafafa; --text-dim:#8a8a8f;
+    --text-mute:#5a5a5f; --ok:#3fb950; --warn:#d29922; --err:#f85149;
+    --radius:8px; --radius-sm:4px;
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --sans: "Inter", system-ui,-apple-system,sans-serif;
+    --disp: "Space Grotesk", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+
+  /* navbar */
+  .nav{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;border-bottom:1px solid var(--border);max-width:1400px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;letter-spacing:.06em;font-size:15px}
+  .brand .mk{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;display:grid;place-items:center;color:var(--text-dim)}
+  .brand .dim{color:var(--text-mute)}
+  .navlinks{display:flex;gap:22px;font-size:14px;color:var(--text-dim)}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 24px 80px}
+
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  .head h1{font-family:var(--disp);font-weight:700;font-size:1.6rem}
+  .ghost{background:none;border:none;color:var(--text-dim);font-size:14px;cursor:pointer}
+  .ghost:hover{color:var(--text)}
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .stat{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:14px 16px}
+  .stat .l{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute)}
+  .stat .v{font-family:var(--mono);font-size:1.35rem;margin-top:6px;display:block}
+
+  /* two-column main + aside */
+  .grid{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  @media(max-width:820px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .grid{grid-template-columns:1fr}
+    .aside{order:-1}
+  }
+
+  .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:18px}
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .sectitle{font-family:var(--disp);font-weight:700;font-size:1.02rem;margin-bottom:12px}
+
+  /* link form (compact, inline) */
+  .linkcard label{display:block;font-family:var(--mono);font-size:.72rem;color:var(--text-dim);margin-bottom:8px}
+  .linkrow{display:flex;gap:10px}
+  .input{flex:1;height:38px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    background:var(--bg);color:var(--text);font-family:var(--mono);font-size:.85rem}
+  .input::placeholder{color:var(--text-mute)}
+  .btn{height:38px;padding:0 18px;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);
+    font-family:var(--mono);font-weight:600;font-size:.8rem;cursor:pointer;white-space:nowrap}
+
+  /* key card */
+  .keycard{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:12px}
+  .khead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .kval{display:flex;align-items:center;gap:8px;min-width:0}
+  .kval .k{font-family:var(--mono);font-size:.9rem}
+  .copy{flex-shrink:0;height:24px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:.68rem;cursor:pointer}
+  .copy:hover{color:var(--text);border-color:var(--text-mute)}
+  .badge{font-family:var(--mono);font-size:.68rem;padding:3px 8px;border-radius:999px;border:1px solid var(--border)}
+  .badge.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+  .badge.neutral{color:var(--text-dim)}
+
+  .kbody{display:flex;flex-direction:column;gap:8px}
+  .krow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.82rem}
+  .krow .kl{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-mute)}
+  .krow .kv{font-family:var(--mono);color:var(--text-dim)}
+  .kv .soon{color:var(--text-mute)}
+
+  .divider{border-top:1px solid var(--border);padding-top:12px}
+  .accesslabel{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-mute);display:block;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 8px;font-family:var(--mono);font-size:.72rem;color:var(--text-dim);background:var(--surface-2)}
+  .actions{display:flex;gap:16px;padding-top:12px;border-top:1px solid var(--border)}
+  .actions button{background:none;border:none;padding:0;color:var(--text-dim);font-size:.82rem;cursor:pointer}
+  .actions button:hover{color:var(--text);text-decoration:underline}
+
+  /* aside: how-to + news */
+  .steps{margin:0 0 14px;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;color:var(--text-dim);font-size:.85rem;line-height:1.5}
+  .code{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);overflow:hidden}
+  .codebar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border)}
+  .codebar .fn{font-family:var(--mono);font-size:.72rem;color:var(--text-dim)}
+  .codebar .cp{font-family:var(--mono);font-size:.7rem;color:var(--text-dim);border:1px solid var(--border);border-radius:4px;padding:2px 8px;cursor:pointer}
+  .codebody{padding:12px;font-family:var(--mono);font-size:.72rem;color:var(--text-dim);overflow-x:auto;white-space:nowrap}
+
+  .newsitem{padding-top:12px;margin-top:12px;border-top:1px solid var(--border)}
+  .newsitem:first-of-type{padding-top:0;margin-top:0;border-top:none}
+  .newshead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .newstitle{font-weight:600;font-size:.92rem}
+  .newsbody{color:var(--text-dim);font-size:.84rem;line-height:1.55;white-space:pre-wrap}
+
+  .note{margin-top:26px;font-family:var(--mono);font-size:.78rem;color:var(--text-dim);line-height:1.6}
+  .note b{color:var(--text)}
+</style>
+
+<div class="nav">
+  <div class="brand"><span class="mk">⚿</span> SYM<span class="dim">BIOS</span></div>
+  <div class="navlinks"><span>Docs</span><span>Panel</span></div>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <h1>Your keys</h1>
+    <button class="ghost">Sign out</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="l">Total keys</span><span class="v">2</span></div>
+    <div class="stat"><span class="l">Active</span><span class="v">2</span></div>
+    <div class="stat"><span class="l">Resets left</span><span class="v">5</span></div>
+    <div class="stat"><span class="l">Next expiry</span><span class="v">in 12 days</span></div>
+  </div>
+
+  <div class="grid">
+    <!-- MAIN: link form + key cards -->
+    <div class="stack">
+      <div class="card linkcard">
+        <label>Link a key to this account</label>
+        <div class="linkrow">
+          <input class="input" placeholder="SYMBIOS-XXXX-XXXX-XXXX">
+          <button class="btn">Link key</button>
+        </div>
+      </div>
+
+      <div class="keycard">
+        <div class="khead">
+          <div class="kval"><span class="k">SYMBIOS-4F9K-QX7T-2MRN</span><button class="copy">Copy</button></div>
+          <span class="badge ok">active</span>
+        </div>
+        <div class="kbody">
+          <div class="krow"><span class="kl">HWID</span><span class="kv">a1b2c3d4…</span></div>
+          <div class="krow"><span class="kl">Resets left</span><span class="kv">2</span></div>
+          <div class="krow"><span class="kl">Expires</span><span class="kv">Sep 25, 2026 <span class="soon">(in 12 days)</span></span></div>
+        </div>
+        <div class="divider">
+          <span class="accesslabel">Script access</span>
+          <div class="chips"><span class="chip">dungeon-lootr</span><span class="chip">grand-blue</span><span class="chip">roll-anime</span></div>
+        </div>
+        <div class="actions"><button>Reset HWID</button><button>Unlink</button></div>
+      </div>
+
+      <div class="keycard">
+        <div class="khead">
+          <div class="kval"><span class="k">BoTa</span><button class="copy">Copy</button></div>
+          <span class="badge ok">active</span>
+        </div>
+        <div class="kbody">
+          <div class="krow"><span class="kl">HWID</span><span class="kv">not bound</span></div>
+          <div class="krow"><span class="kl">Resets left</span><span class="kv">3</span></div>
+          <div class="krow"><span class="kl">Expires</span><span class="kv">Lifetime</span></div>
+        </div>
+        <div class="divider">
+          <span class="accesslabel">Script access</span>
+          <div class="chips"><span class="chip">magic-loot</span></div>
+        </div>
+        <div class="actions"><button style="color:var(--text-mute)">Reset HWID</button><button>Unlink</button></div>
+      </div>
+    </div>
+
+    <!-- ASIDE: how-to + news -->
+    <div class="aside stack">
+      <div class="card">
+        <div class="sectitle">How to use your key</div>
+        <ol class="steps">
+          <li>Copy the loader below.</li>
+          <li>Paste it into your executor and run it.</li>
+          <li>Enter your key when prompted.</li>
+        </ol>
+        <div class="code">
+          <div class="codebar"><span class="fn">symbios-loader.lua</span><span class="cp">Copy</span></div>
+          <div class="codebody">loadstring(game:HttpGet("https://raw.githubusercontent.com/SYMBIOSHUB/SYMBIOS-HUB/refs/heads/main/SYMBIOS.lua"))()</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sectitle">News</div>
+        <div class="newsitem">
+          <div class="newshead"><span class="badge neutral">GIVEAWAY</span><span class="newstitle">500 Members Milestone</span></div>
+          <div class="newsbody">3x FREE keys when the server hits 500 members. Invite your friends!</div>
+        </div>
+        <div class="newsitem">
+          <div class="newshead"><span class="badge neutral">UPDATE</span><span class="newstitle">New raid supported</span></div>
+          <div class="newsbody">Roll Anime raid is now supported.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    layout ใหม่: กว้าง <b>1040px</b> (แคบลงจาก 1180) จัดเป็น <b>2 คอลัมน์</b> ซ้าย = link + คีย์ (โฟกัสหลัก), ขวา = วิธีใช้ + ข่าว (sidebar) · จอแคบยุบเป็นคอลัมน์เดียว (วิธีใช้เด้งขึ้นบน) · การ์ดคีย์กระชับ ไม่ยืดเต็มจอ
+  </p>
+</div>

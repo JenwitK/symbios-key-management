@@ -70,35 +70,6 @@
   padding: var(--space-4);
 }
 
-.chart {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.chartBaseline {
-  stroke: var(--border);
-  stroke-width: 1;
-}
-
-.chartArea {
-  fill: var(--text);
-  opacity: 0.1;
-  stroke: none;
-}
-
-.chartLine {
-  fill: none;
-  stroke: var(--text);
-  stroke-width: 2;
-}
-
-.chartTick {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  fill: var(--text-mute);
-}
-
 .twoColumn {
   margin-top: var(--space-6);
   display: grid;

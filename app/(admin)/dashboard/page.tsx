@@ -1,12 +1,26 @@
 import Link from "next/link";
 import { Badge } from "@/components/Badge/Badge";
+import { AreaChart } from "@/components/AreaChart/AreaChart";
 import { createClient as createAdminClient } from "@/lib/supabase/admin";
 import styles from "./overview.module.css";
 
-const CHART_WIDTH = 700;
-const CHART_HEIGHT = 120;
 const SPARK_DAYS = 14;
 const MISMATCH_ALERT = 10;
+
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 type DayRow = {
   day: string;
@@ -64,11 +78,11 @@ function bangkokDateString(date: Date): string {
   );
 }
 
-function formatTick(day: string) {
+function formatDay(day: string): string {
   const parts = day.split("-");
-  const month = parts[1] ?? "";
-  const date = parts[2] ?? "";
-  return `${Number(month)}/${Number(date)}`;
+  const month = Number(parts[1] ?? "1");
+  const date = Number(parts[2] ?? "1");
+  return `${MONTH_LABELS[month - 1] ?? parts[1]} ${date}`;
 }
 
 function formatDateTime(iso: string) {
@@ -77,33 +91,6 @@ function formatDateTime(iso: string) {
     timeStyle: "short",
     timeZone: "Asia/Bangkok",
   });
-}
-
-function buildAreaChart(values: number[]) {
-  const paddingX = 12;
-  const paddingTop = 12;
-  const paddingBottom = 22;
-  const innerWidth = CHART_WIDTH - paddingX * 2;
-  const innerHeight = CHART_HEIGHT - paddingTop - paddingBottom;
-  const max = Math.max(1, ...values);
-  const stepX = values.length > 1 ? innerWidth / (values.length - 1) : 0;
-
-  const points = values.map((value, i) => ({
-    x: paddingX + stepX * i,
-    y: paddingTop + innerHeight - (value / max) * innerHeight,
-  }));
-
-  const linePath = points
-    .map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-    .join(" ");
-
-  const baselineY = paddingTop + innerHeight;
-  const areaPath =
-    points.length > 0
-      ? `${linePath} L${points[points.length - 1].x.toFixed(1)},${baselineY} L${points[0].x.toFixed(1)},${baselineY} Z`
-      : "";
-
-  return { linePath, areaPath, points, baselineY, paddingX };
 }
 
 export default async function DashboardOverviewPage() {
@@ -235,16 +222,6 @@ export default async function DashboardOverviewPage() {
     },
   ];
 
-  const chart = buildAreaChart(series.map((d) => d.executions));
-  const tickCount = Math.min(5, series.length);
-  const tickIndices = Array.from(
-    new Set(
-      Array.from({ length: tickCount }, (_, i) =>
-        Math.round(((series.length - 1) * i) / (tickCount - 1)),
-      ),
-    ),
-  );
-
   const alerts: Alert[] = [];
 
   if (keylessEmptyScripts.length > 0) {
@@ -315,41 +292,14 @@ export default async function DashboardOverviewPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Executions, last 14 days</h2>
         <div className={styles.chartCard}>
-          <svg
-            viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-            role="img"
-            aria-label="Executions, last 14 days"
-            className={styles.chart}
-          >
-            <line
-              x1={chart.paddingX}
-              y1={chart.baselineY}
-              x2={CHART_WIDTH - chart.paddingX}
-              y2={chart.baselineY}
-              className={styles.chartBaseline}
-            />
-            {chart.areaPath ? (
-              <path d={chart.areaPath} className={styles.chartArea} />
-            ) : null}
-            {chart.linePath ? (
-              <path d={chart.linePath} className={styles.chartLine} />
-            ) : null}
-            {tickIndices.map((i) => {
-              const point = chart.points[i];
-              if (!point) return null;
-              return (
-                <text
-                  key={i}
-                  x={point.x}
-                  y={CHART_HEIGHT - 4}
-                  textAnchor="middle"
-                  className={styles.chartTick}
-                >
-                  {formatTick(series[i].day)}
-                </text>
-              );
-            })}
-          </svg>
+          <AreaChart
+            points={series.map((d) => ({
+              label: formatDay(d.day),
+              value: d.executions,
+            }))}
+            height={120}
+            ariaLabel="Executions, last 14 days"
+          />
         </div>
       </section>
 

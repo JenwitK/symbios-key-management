@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SYMBIOS spotlight refinements</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --surface:#141416; --surface-2:#1c1c1f;
+    --border:rgba(255,255,255,.08); --text:#fafafa; --text-dim:#8a8a8f; --text-mute:#5a5a5f;
+    --ok:#3fb950;
+    --radius:8px; --radius-sm:4px;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace; --sans:system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;position:relative;min-height:100%}
+
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .2s;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  body[data-grain="on"]::before{opacity:.035}
+
+  /* A: Pro - layered core + halo + bottom framing */
+  body[data-bg="pro"]{
+    background:
+      radial-gradient(1000px 520px at 50% -10%, rgba(255,255,255,.085), transparent 55%),
+      radial-gradient(1800px 900px at 50% -26%, rgba(255,255,255,.028), transparent 60%),
+      radial-gradient(130% 100% at 50% 118%, rgba(0,0,0,.5), transparent 52%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* B: Off-center, asymmetric light from top-left */
+  body[data-bg="offset"]{
+    background:
+      radial-gradient(1050px 640px at 24% -14%, rgba(255,255,255,.08), transparent 58%),
+      radial-gradient(120% 100% at 50% 120%, rgba(0,0,0,.4), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* C: Halo - tight bright core */
+  body[data-bg="halo"]{
+    background:
+      radial-gradient(560px 340px at 50% -4%, rgba(255,255,255,.11), transparent 60%),
+      radial-gradient(1500px 780px at 50% -18%, rgba(255,255,255,.03), transparent 62%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* D: Soft wide - understated */
+  body[data-bg="soft"]{
+    background:
+      radial-gradient(1700px 920px at 50% -30%, rgba(255,255,255,.055), transparent 65%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+
+  .controls{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    padding:14px 20px;border-bottom:1px solid var(--border);background:rgba(10,10,11,.7);backdrop-filter:blur(6px)}
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute);margin-right:6px}
+  .chip{font-family:var(--mono);font-size:12px;height:32px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-dim);cursor:pointer}
+  .chip:hover{color:var(--text);border-color:var(--text-mute)}
+  .chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .grain-toggle{margin-left:auto}
+
+  .shell{position:relative;z-index:1;display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 61px)}
+  .side{border-right:1px solid var(--border);padding:22px 16px}
+  .brand{font-family:var(--mono);font-weight:700;margin-bottom:26px}
+  .brand span{color:var(--text-mute)}
+  .navlabel{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-mute);margin:18px 0 8px}
+  .navitem{font-size:14px;color:var(--text-dim);padding:8px 6px;border-radius:var(--radius-sm)}
+  .navitem.active{color:var(--text);border-left:2px solid var(--text);padding-left:10px}
+  .main{padding:44px 44px}
+  .h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--text-dim);font-size:14px;margin-top:6px;margin-bottom:28px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:760px}
+  .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:18px 20px}
+  .card .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute)}
+  .card .v{font-family:var(--mono);font-size:30px;margin-top:10px}
+  .card .d{font-family:var(--mono);font-size:12px;color:var(--ok);margin-top:6px}
+  .snippet{margin:34px 0 60px;max-width:760px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+    padding:16px 18px;font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:pre-wrap;line-height:1.6}
+  .snippet .t{color:var(--text-mute);text-transform:uppercase;letter-spacing:.06em;font-size:11px;display:block;margin-bottom:10px}
+  @media(max-width:720px){.shell{grid-template-columns:1fr}.side{display:none}.main{padding:26px 18px}.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-bg="pro" data-grain="on">
+  <div class="controls">
+    <span class="label">Spotlight</span>
+    <button class="chip" aria-pressed="true" data-set="pro">A Pro (layered)</button>
+    <button class="chip" data-set="offset">B Off-center</button>
+    <button class="chip" data-set="halo">C Halo core</button>
+    <button class="chip" data-set="soft">D Soft wide</button>
+    <button class="chip grain-toggle" data-grain-btn aria-pressed="true">Grain: on</button>
+  </div>
+
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">SYM<span>BIOS</span></div>
+      <div class="navlabel">MANAGE</div>
+      <div class="navitem">Keys</div>
+      <div class="navitem active">Overview</div>
+      <div class="navitem">Scripts</div>
+      <div class="navitem">Obfuscator</div>
+      <div class="navlabel">INSIGHTS</div>
+      <div class="navitem">Logs</div>
+      <div class="navitem">Analytics</div>
+    </aside>
+    <main class="main">
+      <div class="h1">Overview</div>
+      <div class="sub">Live snapshot of keys, executions, and devices.</div>
+      <div class="kpis">
+        <div class="card"><div class="k">Active keys</div><div class="v">1,284</div><div class="d">+42 this week</div></div>
+        <div class="card"><div class="k">Executions today</div><div class="v">9,301</div><div class="d">+12.4%</div></div>
+        <div class="card"><div class="k">Unique devices</div><div class="v">3,177</div><div class="d">+8 today</div></div>
+      </div>
+      <div class="snippet" id="snippet"></div>
+    </main>
+  </div>
+
+<script>
+  var body=document.body;
+  var css={
+    pro:"background:\n  radial-gradient(1000px 520px at 50% -10%, rgba(255,255,255,.085), transparent 55%),\n  radial-gradient(1800px 900px at 50% -26%, rgba(255,255,255,.028), transparent 60%),\n  radial-gradient(130% 100% at 50% 118%, rgba(0,0,0,.5), transparent 52%),\n  var(--bg);\nbackground-attachment:fixed;",
+    offset:"background:\n  radial-gradient(1050px 640px at 24% -14%, rgba(255,255,255,.08), transparent 58%),\n  radial-gradient(120% 100% at 50% 120%, rgba(0,0,0,.4), transparent 55%),\n  var(--bg);\nbackground-attachment:fixed;",
+    halo:"background:\n  radial-gradient(560px 340px at 50% -4%, rgba(255,255,255,.11), transparent 60%),\n  radial-gradient(1500px 780px at 50% -18%, rgba(255,255,255,.03), transparent 62%),\n  var(--bg);\nbackground-attachment:fixed;",
+    soft:"background:\n  radial-gradient(1700px 920px at 50% -30%, rgba(255,255,255,.055), transparent 65%),\n  var(--bg);\nbackground-attachment:fixed;"
+  };
+  var grainCss="body::before{content:\"\";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;\n  background-image:url(\"data:image/svg+xml,...feTurbulence fractalNoise...\");}";
+  function render(){
+    var bg=body.getAttribute("data-bg");
+    var grain=body.getAttribute("data-grain")==="on";
+    var s=css[bg]+(grain?("\n\n/* grain overlay (add once, global) */\n"+grainCss):"");
+    document.getElementById("snippet").innerHTML='<span class="t">globals.css body background'+(grain?" + grain":"")+'</span>'+s.replace(/</g,"&lt;");
+  }
+  document.querySelectorAll("[data-set]").forEach(function(b){
+    b.addEventListener("click",function(){
+      body.setAttribute("data-bg",b.getAttribute("data-set"));
+      document.querySelectorAll("[data-set]").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
+      render();
+    });
+  });
+  var gb=document.querySelector("[data-grain-btn]");
+  gb.addEventListener("click",function(){
+    var on=body.getAttribute("data-grain")!=="on";
+    body.setAttribute("data-grain",on?"on":"off");
+    gb.setAttribute("aria-pressed",on?"true":"false");
+    gb.textContent="Grain: "+(on?"on":"off");
+    render();
+  });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SYMBIOS background v3</title>
+<style>
+  :root{
+    --bg:#0a0a0b; --surface:#141416; --surface-2:#1c1c1f;
+    --border:rgba(255,255,255,.08); --text:#fafafa; --text-dim:#8a8a8f; --text-mute:#5a5a5f;
+    --ok:#3fb950;
+    --radius:10px; --radius-sm:4px;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace; --sans:system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;position:relative;min-height:100%}
+
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .2s;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  body[data-grain="on"]::before{opacity:.03}
+
+  /* A: Aurora blobs - asymmetric ambient light (Linear/Raycast vibe), monochrome */
+  body[data-bg="aurora"]{
+    background:
+      radial-gradient(680px 520px at 16% 6%, rgba(255,255,255,.065), transparent 60%),
+      radial-gradient(780px 620px at 90% 94%, rgba(255,255,255,.05), transparent 62%),
+      radial-gradient(1000px 760px at 62% -12%, rgba(255,255,255,.028), transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* B: Corner glow top-right */
+  body[data-bg="corner"]{
+    background:
+      radial-gradient(1000px 780px at 100% 0%, rgba(255,255,255,.075), transparent 58%),
+      radial-gradient(130% 100% at 40% 125%, rgba(0,0,0,.4), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* C: Header wash - light behind the top chrome, fades into black */
+  body[data-bg="wash"]{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.055), transparent 240px),
+      radial-gradient(1300px 340px at 50% 0%, rgba(255,255,255,.05), transparent 72%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  /* D: Diagonal sheen */
+  body[data-bg="sheen"]{
+    background:
+      linear-gradient(122deg, rgba(255,255,255,.05) 0%, transparent 34%),
+      radial-gradient(1000px 640px at 82% -12%, rgba(255,255,255,.045), transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+
+  .controls{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    padding:14px 20px;border-bottom:1px solid var(--border);background:rgba(10,10,11,.65);backdrop-filter:blur(8px)}
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute);margin-right:6px}
+  .chip{font-family:var(--mono);font-size:12px;height:32px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-dim);cursor:pointer}
+  .chip:hover{color:var(--text);border-color:var(--text-mute)}
+  .chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .grain-toggle{margin-left:auto}
+
+  .shell{position:relative;z-index:1;display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 61px)}
+  .side{border-right:1px solid var(--border);padding:24px 16px}
+  .brand{font-family:var(--mono);font-weight:700;margin-bottom:28px;letter-spacing:.02em}
+  .brand span{color:var(--text-mute)}
+  .navlabel{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-mute);margin:18px 0 8px}
+  .navitem{font-size:14px;color:var(--text-dim);padding:8px 6px;border-radius:var(--radius-sm)}
+  .navitem.active{color:var(--text);border-left:2px solid var(--text);padding-left:10px}
+  .main{padding:46px 46px}
+  .h1{font-size:28px;font-weight:700;letter-spacing:-.02em}
+  .sub{color:var(--text-dim);font-size:14px;margin-top:6px;margin-bottom:30px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:780px}
+  .card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--surface);padding:20px 22px}
+  .card .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute)}
+  .card .v{font-family:var(--mono);font-size:32px;margin-top:12px;letter-spacing:-.01em}
+  .card .d{font-family:var(--mono);font-size:12px;color:var(--ok);margin-top:6px}
+  .snippet{margin:34px 0 60px;max-width:780px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+    padding:16px 18px;font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:pre-wrap;line-height:1.6}
+  .snippet .t{color:var(--text-mute);text-transform:uppercase;letter-spacing:.06em;font-size:11px;display:block;margin-bottom:10px}
+  @media(max-width:720px){.shell{grid-template-columns:1fr}.side{display:none}.main{padding:26px 18px}.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-bg="aurora" data-grain="on">
+  <div class="controls">
+    <span class="label">Modern</span>
+    <button class="chip" aria-pressed="true" data-set="aurora">A Aurora blobs</button>
+    <button class="chip" data-set="corner">B Corner glow</button>
+    <button class="chip" data-set="wash">C Header wash</button>
+    <button class="chip" data-set="sheen">D Diagonal sheen</button>
+    <button class="chip grain-toggle" data-grain-btn aria-pressed="true">Grain: on</button>
+  </div>
+
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">SYM<span>BIOS</span></div>
+      <div class="navlabel">MANAGE</div>
+      <div class="navitem">Keys</div>
+      <div class="navitem active">Overview</div>
+      <div class="navitem">Scripts</div>
+      <div class="navitem">Obfuscator</div>
+      <div class="navlabel">INSIGHTS</div>
+      <div class="navitem">Logs</div>
+      <div class="navitem">Analytics</div>
+    </aside>
+    <main class="main">
+      <div class="h1">Overview</div>
+      <div class="sub">Live snapshot of keys, executions, and devices.</div>
+      <div class="kpis">
+        <div class="card"><div class="k">Active keys</div><div class="v">1,284</div><div class="d">+42 this week</div></div>
+        <div class="card"><div class="k">Executions today</div><div class="v">9,301</div><div class="d">+12.4%</div></div>
+        <div class="card"><div class="k">Unique devices</div><div class="v">3,177</div><div class="d">+8 today</div></div>
+      </div>
+      <div class="snippet" id="snippet"></div>
+    </main>
+  </div>
+
+<script>
+  var body=document.body;
+  var css={
+    aurora:"background:\n  radial-gradient(680px 520px at 16% 6%, rgba(255,255,255,.065), transparent 60%),\n  radial-gradient(780px 620px at 90% 94%, rgba(255,255,255,.05), transparent 62%),\n  radial-gradient(1000px 760px at 62% -12%, rgba(255,255,255,.028), transparent 60%),\n  var(--bg);\nbackground-attachment:fixed;",
+    corner:"background:\n  radial-gradient(1000px 780px at 100% 0%, rgba(255,255,255,.075), transparent 58%),\n  radial-gradient(130% 100% at 40% 125%, rgba(0,0,0,.4), transparent 55%),\n  var(--bg);\nbackground-attachment:fixed;",
+    wash:"background:\n  linear-gradient(180deg, rgba(255,255,255,.055), transparent 240px),\n  radial-gradient(1300px 340px at 50% 0%, rgba(255,255,255,.05), transparent 72%),\n  var(--bg);\nbackground-attachment:fixed;",
+    sheen:"background:\n  linear-gradient(122deg, rgba(255,255,255,.05) 0%, transparent 34%),\n  radial-gradient(1000px 640px at 82% -12%, rgba(255,255,255,.045), transparent 60%),\n  var(--bg);\nbackground-attachment:fixed;"
+  };
+  var grainCss="body::before{content:\"\";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;\n  background-image:url(\"data:image/svg+xml,...feTurbulence fractalNoise...\");}";
+  function render(){
+    var bg=body.getAttribute("data-bg");
+    var grain=body.getAttribute("data-grain")==="on";
+    var s=css[bg]+(grain?("\n\n/* grain overlay (add once, global) */\n"+grainCss):"");
+    document.getElementById("snippet").innerHTML='<span class="t">globals.css body background'+(grain?" + grain":"")+'</span>'+s.replace(/</g,"&lt;");
+  }
+  document.querySelectorAll("[data-set]").forEach(function(b){
+    b.addEventListener("click",function(){
+      body.setAttribute("data-bg",b.getAttribute("data-set"));
+      document.querySelectorAll("[data-set]").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
+      render();
+    });
+  });
+  var gb=document.querySelector("[data-grain-btn]");
+  gb.addEventListener("click",function(){
+    var on=body.getAttribute("data-grain")!=="on";
+    body.setAttribute("data-grain",on?"on":"off");
+    gb.setAttribute("aria-pressed",on?"true":"false");
+    gb.textContent="Grain: "+(on?"on":"off");
+    render();
+  });
+  render();
+</script>
+</body>
+</html>

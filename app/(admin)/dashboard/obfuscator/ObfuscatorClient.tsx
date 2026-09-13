@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/Badge/Badge";
 import { Button } from "@/components/Button/Button";
 import { CodeEditor } from "@/components/CodeEditor/CodeEditor";
 import type {
@@ -31,7 +30,6 @@ type RunError = {
 
 export function ObfuscatorClient() {
   const [account, setAccount] = useState<MoonveilAccount | null>(null);
-  const [accountUnavailable, setAccountUnavailable] = useState(false);
 
   const [mode, setMode] = useState<Mode>("obf");
   const [script, setScript] = useState("");
@@ -59,12 +57,11 @@ export function ObfuscatorClient() {
         const json: { account?: MoonveilAccount; error?: string } = await res.json();
         if (cancelled) return;
         if (!res.ok) {
-          setAccountUnavailable(true);
           return;
         }
         setAccount(json.account ?? null);
       } catch {
-        if (!cancelled) setAccountUnavailable(true);
+        // account fetch failed, char counter falls back to unlimited
       }
     }
 
@@ -158,21 +155,6 @@ export function ObfuscatorClient() {
           <p className={styles.pageSubtitle}>
             Protect your script by SYMBIOS
           </p>
-        </div>
-
-        <div className={styles.statusRow}>
-          {account ? (
-            <>
-              <Badge tone="neutral">{account.plan.name}</Badge>
-              <span className={styles.usage}>
-                {account.usage.used} / {account.usage.quota} today
-              </span>
-            </>
-          ) : accountUnavailable ? (
-            <span className={styles.muted}>Quota unavailable</span>
-          ) : (
-            <span className={styles.muted}>Loading account...</span>
-          )}
         </div>
       </div>
 

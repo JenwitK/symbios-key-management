@@ -14,6 +14,7 @@ const NAV_SECTIONS = [
       { href: "/dashboard/bulk", label: "Bulk keys" },
       { href: "/dashboard/customers", label: "Customers" },
       { href: "/dashboard/scripts", label: "Scripts" },
+      { href: "/dashboard/obfuscator", label: "Obfuscator" },
       { href: "/dashboard/announcement", label: "Announcement" },
     ],
   },

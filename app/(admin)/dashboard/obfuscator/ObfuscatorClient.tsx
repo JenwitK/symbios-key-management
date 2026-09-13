@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/Badge/Badge";
 import { Button } from "@/components/Button/Button";
+import { CodeEditor } from "@/components/CodeEditor/CodeEditor";
 import type {
   MoonveilAccount,
   CompileType,
@@ -324,12 +325,10 @@ export function ObfuscatorClient() {
               {maxChars !== null ? ` / ${maxChars}` : ""}
             </span>
           </div>
-          <textarea
+          <CodeEditor
             value={script}
-            onChange={(event) => setScript(event.target.value)}
-            spellCheck={false}
+            onChange={setScript}
             placeholder="Paste your Lua script here"
-            className={styles.textarea}
           />
         </div>
 

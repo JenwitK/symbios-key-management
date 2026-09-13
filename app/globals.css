@@ -11,6 +11,14 @@
   --warn: #d29922;
   --err: #f85149;
 
+  --syntax-keyword: #7fa8c9;
+  --syntax-string: #9ec49a;
+  --syntax-number: #d0b48a;
+  --syntax-comment: #6b6b70;
+  --syntax-func: #e6e6e6;
+  --syntax-var: #b8b8bd;
+  --syntax-punct: #8a8a90;
+
   --radius: 8px;
   --radius-sm: 4px;
 

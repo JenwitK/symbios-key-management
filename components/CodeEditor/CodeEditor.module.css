@@ -1,0 +1,9 @@
+.wrapper {
+  width: 100%;
+  min-height: 420px;
+  overflow: auto;
+}
+
+.wrapper :global(.cm-editor) {
+  height: 100%;
+}

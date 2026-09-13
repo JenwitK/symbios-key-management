@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
+import { confirmDialog } from "@/lib/confirm";
 import styles from "./announcement.module.css";
 
 export type AnnouncementRow = {
@@ -97,13 +98,13 @@ export function AnnouncementManager({ entries }: AnnouncementManagerProps) {
   }
 
   async function handleDelete(entry: AnnouncementRow) {
-    if (
-      !window.confirm(
-        `Delete "${entry.title || entry.tag || "this announcement"}"? This cannot be undone.`,
-      )
-    ) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Delete this announcement?",
+      text: `"${entry.title || entry.tag || "This announcement"}" cannot be recovered after this.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
 
     const res = await fetch("/api/admin/announcement", {
       method: "DELETE",

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
+import { confirmDialog } from "@/lib/confirm";
 import styles from "./scripts.module.css";
 
 export type ScriptRow = {
@@ -88,9 +89,13 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
   }
 
   async function handleDelete(script: ScriptRow) {
-    if (!window.confirm(`Delete "${script.name}"? This cannot be undone.`)) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Delete this script?",
+      text: `"${script.name}" cannot be recovered after this.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
 
     const res = await fetch("/api/admin/scripts", {
       method: "DELETE",

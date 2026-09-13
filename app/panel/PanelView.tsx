@@ -6,6 +6,7 @@ import { createClient as createBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
+import { confirmDialog } from "@/lib/confirm";
 import styles from "./panel.module.css";
 
 export type PanelKeyRow = {
@@ -76,13 +77,13 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
   }
 
   async function handleUnlink(key: PanelKeyRow) {
-    if (
-      !window.confirm(
-        `Unlink "${key.key_value}" from this account? You can re-link it later with the key.`,
-      )
-    ) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Unlink this key?",
+      text: `You can re-link "${key.key_value}" to this account later with the key.`,
+      confirmText: "Unlink",
+      danger: true,
+    });
+    if (!ok) return;
 
     setResetError(null);
     setPendingUnlinkId(key.id);

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
+import { confirmDialog } from "@/lib/confirm";
 import styles from "./keys.module.css";
 
 export type KeyStatus = "active" | "paused" | "banned" | "expired";
@@ -169,9 +170,13 @@ export function KeysManager({
   }
 
   async function handleDelete(key: KeyRow) {
-    if (!window.confirm(`Delete key "${key.key_value}"? This cannot be undone.`)) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Delete this key?",
+      text: `"${key.key_value}" cannot be recovered after this.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
 
     setPendingActionId(key.id);
     try {

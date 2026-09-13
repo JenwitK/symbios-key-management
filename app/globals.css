@@ -75,3 +75,87 @@ samp,
 pre {
   font-family: var(--font-mono);
 }
+
+/* SweetAlert2 theme (renders into document.body, so this must be global). */
+.swal2-container.sym-swal-container {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.swal2-popup.sym-swal-popup {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: var(--space-6);
+  width: auto;
+  max-width: 400px;
+}
+
+.swal2-popup.sym-swal-popup .swal2-icon {
+  margin: 0 0 var(--space-4);
+}
+
+.swal2-title.sym-swal-title {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 0;
+  margin: 0 0 var(--space-2);
+}
+
+.swal2-html-container.sym-swal-text {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin: 0;
+  padding: 0;
+}
+
+.swal2-actions.sym-swal-actions {
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  width: 100%;
+}
+
+.sym-swal-confirm,
+.sym-swal-confirm-danger,
+.sym-swal-cancel {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.sym-swal-confirm {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.sym-swal-confirm:hover {
+  background: var(--text-dim);
+  border-color: var(--text-dim);
+}
+
+.sym-swal-confirm-danger {
+  background: var(--err);
+  color: #fff;
+}
+
+.sym-swal-confirm-danger:hover {
+  opacity: 0.85;
+}
+
+.sym-swal-cancel {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.sym-swal-cancel:hover {
+  border-color: var(--text-mute);
+}

@@ -8,11 +8,15 @@ import styles from "./settings.module.css";
 type SettingsFormProps = {
   initialKeyPrefix: string;
   initialDefaultResetLimit: number;
+  initialDiscordUrl: string;
+  initialAnnounceAutoSecs: number;
 };
 
 export function SettingsForm({
   initialKeyPrefix,
   initialDefaultResetLimit,
+  initialDiscordUrl,
+  initialAnnounceAutoSecs,
 }: SettingsFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +32,8 @@ export function SettingsForm({
     const formData = new FormData(event.currentTarget);
     const keyPrefix = (formData.get("key_prefix") as string).trim();
     const defaultResetLimit = Number(formData.get("default_reset_limit"));
+    const discordUrl = (formData.get("discord_url") as string).trim();
+    const announceAutoSecs = Number(formData.get("announce_auto_secs"));
 
     try {
       const res = await fetch("/api/admin/settings", {
@@ -37,6 +43,10 @@ export function SettingsForm({
           key_prefix: keyPrefix,
           default_reset_limit: Number.isFinite(defaultResetLimit)
             ? defaultResetLimit
+            : undefined,
+          discord_url: discordUrl,
+          announce_auto_secs: Number.isFinite(announceAutoSecs)
+            ? announceAutoSecs
             : undefined,
         }),
       });
@@ -76,6 +86,31 @@ export function SettingsForm({
             type="number"
             min={0}
             defaultValue={initialDefaultResetLimit}
+            required
+            className={styles.input}
+          />
+        </label>
+      </div>
+
+      <div className={styles.formRow}>
+        <label className={styles.field}>
+          <span className={styles.label}>Discord URL</span>
+          <input
+            name="discord_url"
+            type="text"
+            defaultValue={initialDiscordUrl}
+            required
+            className={styles.input}
+          />
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.label}>Auto-close seconds</span>
+          <input
+            name="announce_auto_secs"
+            type="number"
+            min={0}
+            defaultValue={initialAnnounceAutoSecs}
             required
             className={styles.input}
           />

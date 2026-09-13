@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/bulk", label: "Bulk keys" },
   { href: "/dashboard/customers", label: "Customers" },
   { href: "/dashboard/scripts", label: "Scripts" },
+  { href: "/dashboard/announcement", label: "Announcement" },
   { href: "/dashboard/logs", label: "Logs" },
   { href: "/dashboard/analytics", label: "Analytics" },
   { href: "/dashboard/settings", label: "Settings" },

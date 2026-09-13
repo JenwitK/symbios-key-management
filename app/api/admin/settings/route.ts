@@ -11,6 +11,8 @@ const updateSettingsSchema = z.object({
     .regex(/^[A-Za-z0-9_-]+$/, "key_prefix must be letters, numbers, _ or -")
     .optional(),
   default_reset_limit: z.number().int().min(0).max(999).optional(),
+  discord_url: z.string().trim().url().optional(),
+  announce_auto_secs: z.number().int().min(0).optional(),
 });
 
 export async function PATCH(request: NextRequest) {

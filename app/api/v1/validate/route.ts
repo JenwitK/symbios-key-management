@@ -13,6 +13,18 @@ const validateSchema = z.object({
   script_slug: z.string().trim().min(1).max(200),
 });
 
+async function withRetry<T>(
+  run: () => PromiseLike<{ data: T; error: unknown }>,
+  tries = 3,
+): Promise<{ data: T; error: unknown }> {
+  let result = await run();
+  for (let i = 1; i < tries && result.error; i++) {
+    await new Promise((r) => setTimeout(r, 60 * i)); // 60ms, then 120ms
+    result = await run();
+  }
+  return result;
+}
+
 type ValidateReason =
   | "invalid_key"
   | "banned"
@@ -65,11 +77,13 @@ export async function POST(request: NextRequest) {
   const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
   const adminClient = createAdminClient();
 
-  const { data: scriptRow, error: scriptErr } = await adminClient
-    .from("scripts")
-    .select("id, content, keyless")
-    .eq("slug", scriptSlug)
-    .maybeSingle();
+  const { data: scriptRow, error: scriptErr } = await withRetry(() =>
+    adminClient
+      .from("scripts")
+      .select("id, content, keyless")
+      .eq("slug", scriptSlug)
+      .maybeSingle(),
+  );
 
   if (scriptErr) {
     await logAttempt(adminClient, {
@@ -140,11 +154,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, reason: "key_required" });
   }
 
-  const { data: key, error: keyErr } = await adminClient
-    .from("keys")
-    .select("id, status, hwid, expires_at")
-    .eq("key_value", keyValue)
-    .maybeSingle();
+  const { data: key, error: keyErr } = await withRetry(() =>
+    adminClient
+      .from("keys")
+      .select("id, status, hwid, expires_at")
+      .eq("key_value", keyValue)
+      .maybeSingle(),
+  );
 
   if (keyErr) {
     await logAttempt(adminClient, {
@@ -191,12 +207,14 @@ export async function POST(request: NextRequest) {
   let script: { id: string; content: string | null } | null = null;
 
   if (!reason) {
-    const { data: access, error: accessErr } = await adminClient
-      .from("key_scripts")
-      .select("key_id")
-      .eq("key_id", key.id as string)
-      .eq("script_id", scriptRow.id as string)
-      .maybeSingle();
+    const { data: access, error: accessErr } = await withRetry(() =>
+      adminClient
+        .from("key_scripts")
+        .select("key_id")
+        .eq("key_id", key.id as string)
+        .eq("script_id", scriptRow.id as string)
+        .maybeSingle(),
+    );
 
     if (accessErr) {
       await logAttempt(adminClient, {

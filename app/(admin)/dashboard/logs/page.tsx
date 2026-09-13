@@ -48,6 +48,7 @@ function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Bangkok",
   });
 }
 
@@ -73,8 +74,8 @@ export default async function LogsPage({
   const to = typeof params.to === "string" ? params.to : "";
   const page = Math.max(1, Number(params.page) || 1);
 
-  const fromTs = from ? new Date(from).toISOString() : null;
-  const toTs = to ? new Date(`${to}T23:59:59.999`).toISOString() : null;
+  const fromTs = from ? new Date(`${from}T00:00:00+07:00`).toISOString() : null;
+  const toTs = to ? new Date(`${to}T23:59:59.999+07:00`).toISOString() : null;
 
   const adminClient = createAdminClient();
   let query = adminClient

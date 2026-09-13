@@ -117,8 +117,12 @@ export function KeysManager({
     const label = (formData.get("label") as string).trim();
     const expiresRaw = formData.get("expires_at") as string;
     const hwidResetLimit = Number(formData.get("hwid_reset_limit"));
+    const keyValue = isCreating
+      ? (formData.get("key_value") as string).trim()
+      : "";
 
     const payload = {
+      ...(keyValue ? { key_value: keyValue } : {}),
       label: label || undefined,
       expires_at: expiresRaw ? new Date(expiresRaw).toISOString() : null,
       hwid_reset_limit: Number.isFinite(hwidResetLimit)
@@ -211,7 +215,17 @@ export function KeysManager({
         <form onSubmit={handleSubmit} className={styles.form}>
           {editing ? (
             <p className={styles.editingKey}>{editing.key_value}</p>
-          ) : null}
+          ) : (
+            <label className={styles.field}>
+              <span className={styles.label}>Custom key (optional)</span>
+              <input
+                name="key_value"
+                type="text"
+                placeholder="blank = auto SYMBIOS-XXXX"
+                className={styles.input}
+              />
+            </label>
+          )}
 
           <div className={styles.formRow}>
             <label className={styles.field}>

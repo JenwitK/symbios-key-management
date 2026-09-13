@@ -1,0 +1,37 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 34px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.button:hover {
+  color: var(--text);
+  border-color: var(--text-mute);
+}
+
+.button:disabled {
+  color: var(--text-mute);
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: symSpin 1s linear infinite;
+}
+
+@keyframes symSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

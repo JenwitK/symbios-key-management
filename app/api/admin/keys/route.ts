@@ -11,6 +11,13 @@ const createSchema = z.object({
   expires_at: z.string().datetime().nullable().optional(),
   hwid_reset_limit: z.number().int().min(0).optional(),
   script_ids: z.array(z.string().uuid()).default([]),
+  key_value: z
+    .string()
+    .trim()
+    .min(3)
+    .max(64)
+    .regex(/^[A-Za-z0-9_-]+$/, "Key may only contain letters, numbers, _ or -")
+    .optional(),
 });
 
 const updateSchema = z.object({
@@ -54,22 +61,13 @@ export async function POST(request: NextRequest) {
     return badRequest(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const { data: settings } = await auth.adminClient
-    .from("settings")
-    .select("key_prefix")
-    .eq("id", 1)
-    .maybeSingle();
-
-  const prefix = (settings?.key_prefix as string | undefined) ?? "SYMBIOS";
-
   let key: Record<string, unknown> | null = null;
-  let lastErrorMessage = "Could not generate a unique key";
 
-  for (let attempt = 0; attempt < MAX_GENERATE_ATTEMPTS && !key; attempt++) {
+  if (parsed.data.key_value) {
     const { data, error } = await auth.adminClient
       .from("keys")
       .insert({
-        key_value: generateKeyValue(prefix),
+        key_value: parsed.data.key_value,
         label: parsed.data.label || null,
         expires_at: parsed.data.expires_at ?? null,
         ...(parsed.data.hwid_reset_limit !== undefined
@@ -79,18 +77,52 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (data) {
-      key = data;
-    } else if (error?.code === UNIQUE_VIOLATION) {
-      lastErrorMessage = error.message;
-      continue;
-    } else if (error) {
+    if (error?.code === UNIQUE_VIOLATION) {
+      return badRequest("That key already exists, choose another.");
+    }
+    if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-  }
 
-  if (!key) {
-    return NextResponse.json({ error: lastErrorMessage }, { status: 500 });
+    key = data;
+  } else {
+    const { data: settings } = await auth.adminClient
+      .from("settings")
+      .select("key_prefix")
+      .eq("id", 1)
+      .maybeSingle();
+
+    const prefix = (settings?.key_prefix as string | undefined) ?? "SYMBIOS";
+
+    let lastErrorMessage = "Could not generate a unique key";
+
+    for (let attempt = 0; attempt < MAX_GENERATE_ATTEMPTS && !key; attempt++) {
+      const { data, error } = await auth.adminClient
+        .from("keys")
+        .insert({
+          key_value: generateKeyValue(prefix),
+          label: parsed.data.label || null,
+          expires_at: parsed.data.expires_at ?? null,
+          ...(parsed.data.hwid_reset_limit !== undefined
+            ? { hwid_reset_limit: parsed.data.hwid_reset_limit }
+            : {}),
+        })
+        .select()
+        .single();
+
+      if (data) {
+        key = data;
+      } else if (error?.code === UNIQUE_VIOLATION) {
+        lastErrorMessage = error.message;
+        continue;
+      } else if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+    }
+
+    if (!key) {
+      return NextResponse.json({ error: lastErrorMessage }, { status: 500 });
+    }
   }
 
   if (parsed.data.script_ids.length > 0) {

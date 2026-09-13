@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RefreshButton } from "@/components/RefreshButton/RefreshButton";
 import { logout } from "./actions";
 import styles from "./dashboard.module.css";
 
@@ -9,11 +10,15 @@ export function Topbar() {
         SYM<span className={styles.wordmarkDim}>BIOS</span>
       </Link>
 
-      <form action={logout}>
-        <button type="submit" className={styles.logoutButton}>
-          Log out
-        </button>
-      </form>
+      <div className={styles.topbarActions}>
+        <RefreshButton />
+
+        <form action={logout}>
+          <button type="submit" className={styles.logoutButton}>
+            Log out
+          </button>
+        </form>
+      </div>
     </header>
   );
 }

@@ -54,6 +54,12 @@
   color: var(--text-dim);
 }
 
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .logoutButton {
   height: 34px;
   padding: 0 var(--space-4);

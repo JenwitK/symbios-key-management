@@ -17,6 +17,8 @@ export async function confirmDialog(opts: ConfirmDialogOptions): Promise<boolean
     cancelButtonText: "Cancel",
     buttonsStyling: false,
     showClass: { popup: "" },
+    scrollbarPadding: false,
+    heightAuto: false,
     customClass: {
       container: "sym-swal-container",
       popup: "sym-swal-popup",

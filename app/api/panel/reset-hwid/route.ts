@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     .eq("id", parsed.data.key_id)
     .maybeSingle();
 
-  // Not found OR belongs to someone else — same 404 either way, so we don't
+  // Not found OR belongs to someone else: same 404 either way, so we don't
   // leak whether a given key id exists.
   if (!key || key.discord_id !== auth.discordId) {
     return NextResponse.json({ error: "Key not found." }, { status: 404 });
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
   if (!updated) {
     return NextResponse.json(
-      { error: "Reset was already used elsewhere — refresh and try again." },
+      { error: "Reset was already used elsewhere. Refresh and try again." },
       { status: 409 },
     );
   }

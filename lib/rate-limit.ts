@@ -6,7 +6,7 @@ const buckets = new Map<string, Bucket>();
  * Naive fixed-window rate limiter, in-memory and per-process only.
  *
  * TODO(production): this resets on every cold start and isn't shared across
- * serverless instances — replace with a shared store (Upstash Redis, or a
+ * serverless instances. Replace with a shared store (Upstash Redis, or a
  * Postgres table keyed by IP) before relying on it in production.
  */
 export function isRateLimited(

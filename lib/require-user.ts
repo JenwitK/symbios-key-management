@@ -9,7 +9,7 @@ export type UserSession = {
 
 /**
  * Discord OAuth identity data isn't strongly typed by supabase-js (it's
- * `Record<string, any>`, provider-specific) — check the couple of field
+ * `Record<string, any>`, provider-specific): check the couple of field
  * names Supabase/Discord actually populate rather than trusting one shape.
  */
 function extractDiscordId(user: User): string | null {
@@ -30,11 +30,11 @@ function extractDiscordId(user: User): string | null {
   return typeof fromIdentity === "string" && fromIdentity ? fromIdentity : null;
 }
 
-/** Logged in AND has a Discord identity — null otherwise. */
+/** Logged in AND has a Discord identity; null otherwise. */
 export async function getUserSession(): Promise<UserSession | null> {
   const supabase = await createServerClient();
 
-  // Local JWT verification (no network) — see lib/require-admin.ts.
+  // Local JWT verification (no network). See lib/require-admin.ts.
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
 

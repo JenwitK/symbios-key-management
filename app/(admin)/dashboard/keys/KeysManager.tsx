@@ -45,7 +45,7 @@ const STATUS_TONE: Record<KeyStatus, "ok" | "warn" | "err" | "neutral"> = {
 };
 
 function formatDate(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -194,7 +194,7 @@ export function KeysManager({
         <div>
           <h1 className={styles.pageTitle}>Keys</h1>
           <p className={styles.pageSubtitle}>
-            Issue and manage whitelist keys — HWID binds on first validate.
+            Issue and manage whitelist keys. HWID binds on first validate.
           </p>
         </div>
         <Button type="button" onClick={openCreateForm}>
@@ -312,7 +312,7 @@ export function KeysManager({
                 <div className={`${styles.cell} ${styles.mono}`}>
                   {key.key_value}
                 </div>
-                <div className={styles.cell}>{key.label || "—"}</div>
+                <div className={styles.cell}>{key.label || "-"}</div>
                 <div className={styles.cell}>
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
                 </div>

@@ -228,16 +228,16 @@ export default async function LogsPage({
                 </Badge>
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
-                {log.keys?.key_value ?? "—"}
+                {log.keys?.key_value ?? "-"}
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
-                {log.scripts?.name ?? "—"}
+                {log.scripts?.name ?? "-"}
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
                 <HwidCell hwid={log.hwid} />
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
-                {log.ip ?? "—"}
+                {log.ip ?? "-"}
               </div>
             </div>
           ))}

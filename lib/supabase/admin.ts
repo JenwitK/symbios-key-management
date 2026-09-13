@@ -1,7 +1,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Privileged client — bypasses RLS via the service role key.
+ * Privileged client: bypasses RLS via the service role key.
  * Server-only: never import this into a client component.
  */
 export function createClient() {

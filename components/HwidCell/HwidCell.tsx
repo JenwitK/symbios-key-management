@@ -9,7 +9,7 @@ export function HwidCell({ hwid }: { hwid: string | null }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!hwid) {
-    return <span>—</span>;
+    return <span>-</span>;
   }
 
   if (hwid.length <= TRUNCATE_LENGTH + 1) {

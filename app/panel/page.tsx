@@ -8,7 +8,7 @@ import { PanelView, type PanelKeyRow } from "./PanelView";
 import styles from "./panel.module.css";
 
 export const metadata: Metadata = {
-  title: "Panel — SYMBIOS",
+  title: "Panel · SYMBIOS",
 };
 
 export default async function PanelPage() {

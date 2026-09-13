@@ -218,7 +218,7 @@ export function PanelView({ keys }: { keys: PanelKeyRow[] }) {
 
           {keys.length === 0 ? (
             <div className={styles.empty}>
-              No keys linked yet — link one above.
+              No keys linked yet. Link one above.
             </div>
           ) : null}
         </div>

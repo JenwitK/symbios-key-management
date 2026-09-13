@@ -4,7 +4,7 @@ import { LoginForm } from "./LoginForm";
 import styles from "./login.module.css";
 
 export const metadata: Metadata = {
-  title: "Admin login — SYMBIOS",
+  title: "Admin login · SYMBIOS",
 };
 
 export default function LoginPage() {

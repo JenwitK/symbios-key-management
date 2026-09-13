@@ -4,30 +4,30 @@ import { FeatureRow } from "@/components/FeatureRow/FeatureRow";
 import { Footer } from "@/components/Footer/Footer";
 import styles from "./page.module.css";
 
-const FEATURES = [
+const STEPS = [
   {
     index: "01",
-    title: "HWID-locked keys",
+    title: "Open your panel",
     description:
-      "A key binds to one machine on first use. Swap hardware and the key stops working until an HWID reset clears the lock.",
+      "Head to the panel and sign in with the Discord account you used when you got your key.",
   },
   {
     index: "02",
-    title: "Server-side whitelist",
+    title: "Link your key",
     description:
-      "The obfuscated script never ships with the loader. It stays on our server and is only returned after the key and HWID pass validation.",
+      "Paste your SYMBIOS-XXXX-XXXX-XXXX key into the link box and press Link key. It shows up in your keys list.",
   },
   {
     index: "03",
-    title: "Self-service panel",
+    title: "Press Reset HWID",
     description:
-      "Buyers link their key to a Discord account and reset their own HWID — no waiting on an admin for routine changes.",
+      "Find your key in the list and press Reset HWID to clear the device lock. Watch the Resets left count: each reset uses one.",
   },
   {
     index: "04",
-    title: "Instant script updates",
+    title: "Run on your new device",
     description:
-      "Push a new build once in the dashboard. Every key holder gets it on their next loadstring — no re-download, no version drift.",
+      "Launch the loader on the device you want to use. Your key binds to it automatically on the first run.",
   },
 ] as const;
 
@@ -38,18 +38,30 @@ export default function Home() {
       <main>
         <Hero />
         <section className={styles.features}>
-          <h2 className={styles.featuresTitle}>What gets enforced</h2>
+          <h2 className={styles.featuresTitle}>How to reset your HWID</h2>
           <div className={styles.featuresList}>
-            {FEATURES.map((feature, i) => (
+            {STEPS.map((step, i) => (
               <FeatureRow
-                key={feature.index}
-                index={feature.index}
-                title={feature.title}
-                description={feature.description}
+                key={step.index}
+                index={step.index}
+                title={step.title}
+                description={step.description}
                 align={i % 2 === 0 ? "start" : "end"}
               />
             ))}
           </div>
+          <p className={styles.note}>
+            Reset HWID greyed out? Either no device is bound to that key yet,
+            or you are out of resets. Ask in our{" "}
+            <a
+              href="https://discord.gg/RWbYvbyB2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Discord
+            </a>
+            .
+          </p>
         </section>
       </main>
       <Footer />

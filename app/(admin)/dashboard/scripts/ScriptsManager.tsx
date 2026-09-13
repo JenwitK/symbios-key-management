@@ -109,7 +109,7 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
         <div>
           <h1 className={styles.pageTitle}>Scripts</h1>
           <p className={styles.pageSubtitle}>
-            Paste MoonVeil output here — served as-is by /api/v1/validate.
+            Paste MoonVeil output here. Served as-is by /api/v1/validate.
           </p>
         </div>
         <Button
@@ -170,12 +170,12 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
               name="keyless"
               defaultChecked={editing?.keyless ?? false}
             />
-            Keyless — no key required
+            Keyless (no key required)
           </label>
 
           <label className={styles.field}>
             <span className={styles.label}>
-              Content (obfuscated — paste MoonVeil output)
+              Content (obfuscated, paste MoonVeil output)
             </span>
             <textarea
               name="content"

@@ -10,7 +10,7 @@ type AdminSession = {
   adminClient: AdminClient;
 };
 
-/** Logged in AND has a row in `admins` — null otherwise. */
+/** Logged in AND has a row in `admins`; null otherwise. */
 async function getAdminSession(): Promise<AdminSession | null> {
   const supabase = await createServerClient();
 
@@ -63,7 +63,7 @@ export async function requireAdmin(): Promise<RequireAdminResult> {
 
 /**
  * For Server Components / layouts. Same check as `requireAdmin`, but
- * redirects to /login instead of returning a JSON 401 — this is what
+ * redirects to /login instead of returning a JSON 401. This is what
  * actually gates every page under /dashboard, since those pages read
  * through the service-role client and would otherwise leak admin data
  * (script content, keys, logs) to any logged-in non-admin user.

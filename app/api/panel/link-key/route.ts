@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Compare-and-swap: only claim if discord_id is STILL null at write time —
-  // guards two link attempts racing on the same unlinked key.
+  // Compare-and-swap: only claim if discord_id is STILL null at write time.
+  // Guards two link attempts racing on the same unlinked key.
   const { data: linked, error } = await adminClient
     .from("keys")
     .update({ discord_id: auth.discordId })
@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
 
   const adminClient = createAdminClient();
 
-  // Only unlink if it's still ours — same 404 whether it's someone else's
+  // Only unlink if it's still ours: same 404 whether it's someone else's
   // key or doesn't exist, so we don't leak which.
   const { data: unlinked, error } = await adminClient
     .from("keys")

@@ -4,7 +4,7 @@ import { createClient as createAdminClient } from "@/lib/supabase/admin";
 import { isRateLimited } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-ip";
 
-// Public, Lua-facing endpoint — no session, so it goes straight to the
+// Public, Lua-facing endpoint with no session, so it goes straight to the
 // service-role client. Do NOT put requireAdmin() on this route.
 
 const validateSchema = z.object({
@@ -149,8 +149,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, reason: "invalid_key" });
   }
 
-  // Time-based expiry always wins, regardless of whatever `status` holds —
-  // there's no cron flipping status to 'expired' when expires_at passes.
+  // Time-based expiry always wins, regardless of whatever `status` holds.
+  // There's no cron flipping status to 'expired' when expires_at passes.
   const isTimeExpired =
     key.expires_at !== null && new Date(key.expires_at as string).getTime() < Date.now();
 
@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
       if (bound) {
         hwidAlreadyWritten = true;
       } else {
-        // Lost the race — someone else bound first. Re-read and compare.
+        // Lost the race: someone else bound first. Re-read and compare.
         const { data: current, error: rereadErr } = await adminClient
           .from("keys")
           .select("hwid")
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Only flag a mismatch when the re-read actually came back with a
-        // non-null hwid that differs — a null/missing value here just means
+        // non-null hwid that differs. A null/missing value here just means
         // the bind didn't land this time, not that another device owns it.
         if (current?.hwid != null && current.hwid !== hwid) {
           reason = "hwid_mismatch";

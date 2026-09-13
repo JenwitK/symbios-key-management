@@ -15,3 +15,14 @@
 .featuresList {
   margin-top: var(--space-4);
 }
+
+.note {
+  margin-top: var(--space-6);
+  color: var(--text-dim);
+  font-size: 0.9375rem;
+}
+
+.note a {
+  color: var(--text);
+  text-decoration: underline;
+}

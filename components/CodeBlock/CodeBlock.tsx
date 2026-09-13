@@ -17,7 +17,7 @@ export function CodeBlock({ filename, code }: CodeBlockProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard API unavailable (e.g. insecure context) — no-op
+      // clipboard API unavailable (e.g. insecure context): no-op
     }
   }
 

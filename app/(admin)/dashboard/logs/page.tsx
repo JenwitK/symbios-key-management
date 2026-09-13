@@ -40,6 +40,7 @@ type LogRow = {
   hwid: string | null;
   ip: string | null;
   created_at: string;
+  script_slug: string | null;
   keys: { key_value: string } | null;
   scripts: { name: string } | null;
 };
@@ -80,7 +81,7 @@ export default async function LogsPage({
   const adminClient = createAdminClient();
   let query = adminClient
     .from("validation_logs")
-    .select("id, result, hwid, ip, created_at, keys(key_value), scripts(name)", {
+    .select("id, result, hwid, ip, created_at, script_slug, keys(key_value), scripts(name)", {
       count: "exact",
     })
     .order("created_at", { ascending: false });
@@ -213,6 +214,7 @@ export default async function LogsPage({
             <div className={styles.headerCell}>Result</div>
             <div className={styles.headerCell}>Key</div>
             <div className={styles.headerCell}>Script</div>
+            <div className={styles.headerCell}>Slug</div>
             <div className={styles.headerCell}>HWID</div>
             <div className={styles.headerCell}>IP</div>
           </div>
@@ -232,6 +234,9 @@ export default async function LogsPage({
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
                 {log.scripts?.name ?? "-"}
+              </div>
+              <div className={`${styles.cell} ${styles.mono}`}>
+                {log.script_slug ?? "-"}
               </div>
               <div className={`${styles.cell} ${styles.mono}`}>
                 <HwidCell hwid={log.hwid} />

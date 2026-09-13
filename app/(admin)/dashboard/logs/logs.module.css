@@ -162,9 +162,10 @@
     minmax(90px, 0.7fr)
     minmax(140px, 1.1fr)
     minmax(110px, 1fr)
+    minmax(110px, 1fr)
     minmax(90px, 0.8fr)
     minmax(100px, 0.9fr);
-  min-width: 720px;
+  min-width: 830px;
   font-size: 0.875rem;
 }
 

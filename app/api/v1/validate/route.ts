@@ -21,13 +21,15 @@ type ValidateReason =
   | "no_access"
   | "hwid_mismatch"
   | "key_required"
-  | "server_error";
+  | "server_error"
+  | "unknown_script";
 
 async function logAttempt(
   adminClient: ReturnType<typeof createAdminClient>,
   entry: {
     keyId: string | null;
     scriptId: string | null;
+    scriptSlug: string;
     hwid: string;
     ip: string | null;
     result: ValidateReason | "ok";
@@ -36,6 +38,7 @@ async function logAttempt(
   await adminClient.from("validation_logs").insert({
     key_id: entry.keyId,
     script_id: entry.scriptId,
+    script_slug: entry.scriptSlug,
     hwid: entry.hwid,
     ip: entry.ip,
     result: entry.result,
@@ -72,6 +75,7 @@ export async function POST(request: NextRequest) {
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: null,
+      scriptSlug,
       hwid,
       ip,
       result: "server_error",
@@ -87,6 +91,7 @@ export async function POST(request: NextRequest) {
       await logAttempt(adminClient, {
         keyId: null,
         scriptId: scriptRow.id as string,
+        scriptSlug,
         hwid,
         ip,
         result: "server_error",
@@ -100,6 +105,7 @@ export async function POST(request: NextRequest) {
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: scriptRow.id as string,
+      scriptSlug,
       hwid,
       ip,
       result: "ok",
@@ -107,10 +113,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, script: scriptRow.content });
   }
 
+  if (!scriptRow) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: null,
+      scriptSlug,
+      hwid,
+      ip,
+      result: "unknown_script",
+    });
+    return NextResponse.json(
+      { success: false, reason: "unknown_script" },
+      { status: 404 },
+    );
+  }
+
   if (!keyValue) {
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: scriptRow?.id ?? null,
+      scriptSlug,
       hwid,
       ip,
       result: "key_required",
@@ -128,6 +150,7 @@ export async function POST(request: NextRequest) {
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: scriptRow?.id ?? null,
+      scriptSlug,
       hwid,
       ip,
       result: "server_error",
@@ -142,6 +165,7 @@ export async function POST(request: NextRequest) {
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: scriptRow?.id ?? null,
+      scriptSlug,
       hwid,
       ip,
       result: "invalid_key",
@@ -167,35 +191,32 @@ export async function POST(request: NextRequest) {
   let script: { id: string; content: string | null } | null = null;
 
   if (!reason) {
-    if (!scriptRow) {
+    const { data: access, error: accessErr } = await adminClient
+      .from("key_scripts")
+      .select("key_id")
+      .eq("key_id", key.id as string)
+      .eq("script_id", scriptRow.id as string)
+      .maybeSingle();
+
+    if (accessErr) {
+      await logAttempt(adminClient, {
+        keyId: key.id as string,
+        scriptId: scriptRow.id as string,
+        scriptSlug,
+        hwid,
+        ip,
+        result: "server_error",
+      });
+      return NextResponse.json(
+        { success: false, reason: "server_error" },
+        { status: 503 },
+      );
+    }
+
+    if (!access) {
       reason = "no_access";
     } else {
-      const { data: access, error: accessErr } = await adminClient
-        .from("key_scripts")
-        .select("key_id")
-        .eq("key_id", key.id as string)
-        .eq("script_id", scriptRow.id as string)
-        .maybeSingle();
-
-      if (accessErr) {
-        await logAttempt(adminClient, {
-          keyId: key.id as string,
-          scriptId: scriptRow.id as string,
-          hwid,
-          ip,
-          result: "server_error",
-        });
-        return NextResponse.json(
-          { success: false, reason: "server_error" },
-          { status: 503 },
-        );
-      }
-
-      if (!access) {
-        reason = "no_access";
-      } else {
-        script = scriptRow;
-      }
+      script = scriptRow;
     }
   }
 
@@ -223,6 +244,7 @@ export async function POST(request: NextRequest) {
         await logAttempt(adminClient, {
           keyId: key.id as string,
           scriptId: script.id,
+          scriptSlug,
           hwid,
           ip,
           result: "server_error",
@@ -247,6 +269,7 @@ export async function POST(request: NextRequest) {
           await logAttempt(adminClient, {
             keyId: key.id as string,
             scriptId: script.id,
+            scriptSlug,
             hwid,
             ip,
             result: "server_error",
@@ -279,6 +302,7 @@ export async function POST(request: NextRequest) {
   await logAttempt(adminClient, {
     keyId: key.id as string,
     scriptId: script?.id ?? null,
+    scriptSlug,
     hwid,
     ip,
     result: reason ?? "ok",

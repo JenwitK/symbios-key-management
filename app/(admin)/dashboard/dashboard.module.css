@@ -9,6 +9,25 @@
   padding: var(--space-6) var(--space-4);
 }
 
+.navSection {
+  margin-top: var(--space-5);
+}
+
+.navSection:first-child {
+  margin-top: 0;
+}
+
+.navSectionLabel {
+  padding: 0 var(--space-3) 0 calc(var(--space-3) + 6px);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .navList {
   list-style: none;
   display: flex;
@@ -17,8 +36,9 @@
 }
 
 .navLink {
+  position: relative;
   display: block;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) calc(var(--space-3) + 6px);
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   color: var(--text-dim);
@@ -27,6 +47,21 @@
 .navLink:hover {
   background: var(--surface);
   color: var(--text);
+}
+
+.navLinkActive {
+  color: var(--text);
+}
+
+.navLinkActive::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--text);
+  border-radius: 1px;
 }
 
 .main {

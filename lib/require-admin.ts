@@ -13,11 +13,15 @@ type AdminSession = {
 /** Logged in AND has a row in `admins` — null otherwise. */
 async function getAdminSession(): Promise<AdminSession | null> {
   const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
+  // getClaims() verifies the JWT locally against the cached JWKS (no network
+  // round-trip) now that the project uses asymmetric signing keys. Middleware
+  // (proxy.ts) still runs getUser() to refresh/rotate tokens; here we only
+  // need to trust the already-refreshed access token.
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub;
+
+  if (!userId) {
     return null;
   }
 
@@ -25,14 +29,14 @@ async function getAdminSession(): Promise<AdminSession | null> {
   const { data: admin } = await adminClient
     .from("admins")
     .select("id")
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
 
   if (!admin) {
     return null;
   }
 
-  return { userId: user.id, adminClient };
+  return { userId, adminClient };
 }
 
 type RequireAdminResult =

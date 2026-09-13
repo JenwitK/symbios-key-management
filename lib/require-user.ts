@@ -33,10 +33,36 @@ function extractDiscordId(user: User): string | null {
 /** Logged in AND has a Discord identity — null otherwise. */
 export async function getUserSession(): Promise<UserSession | null> {
   const supabase = await createServerClient();
+
+  // Local JWT verification (no network) — see lib/require-admin.ts.
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+
+  if (!claims?.sub) {
+    return null;
+  }
+
+  const userId = claims.sub;
+
+  // The JWT payload carries user_metadata but NOT the full identities array,
+  // so read the Discord id from metadata first.
+  const metadata = claims.user_metadata as
+    | { provider_id?: unknown; sub?: unknown }
+    | undefined;
+  const fromMetadata =
+    (typeof metadata?.provider_id === "string" && metadata.provider_id) ||
+    (typeof metadata?.sub === "string" && metadata.sub) ||
+    null;
+
+  if (fromMetadata) {
+    return { userId, discordId: fromMetadata };
+  }
+
+  // Fall back to one network getUser() only when the token didn't carry the
+  // Discord id, so no buyer whose id lives only in identities gets locked out.
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) {
     return null;
   }
@@ -46,7 +72,7 @@ export async function getUserSession(): Promise<UserSession | null> {
     return null;
   }
 
-  return { userId: user.id, discordId };
+  return { userId, discordId };
 }
 
 type RequireUserResult =

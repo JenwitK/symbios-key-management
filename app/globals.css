@@ -113,7 +113,7 @@ pre {
 }
 
 .swal2-actions.sym-swal-actions {
-  justify-content: flex-end;
+  justify-content: center;
   gap: var(--space-2);
   margin-top: var(--space-5);
   width: 100%;

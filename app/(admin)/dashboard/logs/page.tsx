@@ -9,22 +9,28 @@ const PAGE_SIZE = 25;
 const RESULT_OPTIONS = [
   "all",
   "ok",
+  "key_required",
   "invalid_key",
-  "banned",
-  "paused",
-  "expired",
   "no_access",
   "hwid_mismatch",
+  "expired",
+  "banned",
+  "paused",
+  "unknown_script",
+  "server_error",
 ] as const;
 
 const RESULT_TONE: Record<string, "ok" | "warn" | "err" | "neutral"> = {
   ok: "ok",
+  key_required: "neutral",
   invalid_key: "err",
   banned: "err",
   hwid_mismatch: "err",
   paused: "warn",
   expired: "warn",
   no_access: "warn",
+  unknown_script: "warn",
+  server_error: "err",
 };
 
 type TopScript = {
@@ -71,6 +77,7 @@ export default async function LogsPage({
 }: PageProps<"/dashboard/logs">) {
   const params = await searchParams;
   const result = typeof params.result === "string" ? params.result : "all";
+  const slug = typeof params.slug === "string" ? params.slug : "";
   const from = typeof params.from === "string" ? params.from : "";
   const to = typeof params.to === "string" ? params.to : "";
   const page = Math.max(1, Number(params.page) || 1);
@@ -88,6 +95,9 @@ export default async function LogsPage({
 
   if (result !== "all") {
     query = query.eq("result", result);
+  }
+  if (slug) {
+    query = query.ilike("script_slug", `%${slug}%`);
   }
   if (fromTs) {
     query = query.gte("created_at", fromTs);
@@ -108,7 +118,7 @@ export default async function LogsPage({
 
   const logs = (data ?? []) as unknown as LogRow[];
   const totalPages = count ? Math.max(1, Math.ceil(count / PAGE_SIZE)) : 1;
-  const currentQuery = { result, from, to, page: String(page) };
+  const currentQuery = { result, slug, from, to, page: String(page) };
 
   const executionStats = (statsData?.[0] ?? {
     total_executions: 0,
@@ -180,6 +190,17 @@ export default async function LogsPage({
               </option>
             ))}
           </select>
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.label}>Slug</span>
+          <input
+            type="text"
+            name="slug"
+            defaultValue={slug}
+            placeholder="e.g. dungeon-lootr"
+            className={styles.input}
+          />
         </label>
 
         <label className={styles.field}>

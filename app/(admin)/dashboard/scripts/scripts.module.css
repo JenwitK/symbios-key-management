@@ -99,11 +99,11 @@
     minmax(160px, 1.6fr)
     minmax(110px, 1fr)
     minmax(150px, 0.9fr)
-    minmax(80px, 0.6fr)
-    minmax(70px, 0.5fr)
+    minmax(96px, 0.6fr)
+    minmax(80px, 0.5fr)
     minmax(190px, 1.1fr)
     minmax(120px, 0.8fr);
-  min-width: 880px;
+  min-width: 900px;
   font-size: 0.875rem;
 }
 
@@ -150,6 +150,10 @@
 }
 
 .time {
+  white-space: nowrap;
+}
+
+.num {
   white-space: nowrap;
 }
 

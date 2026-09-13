@@ -234,10 +234,10 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
                   <Badge tone="neutral">keyless</Badge>
                 ) : null}
               </div>
-              <div className={`${styles.cell} ${styles.mono}`}>
+              <div className={`${styles.cell} ${styles.mono} ${styles.num}`}>
                 {formatBytes(script.content)}
               </div>
-              <div className={`${styles.cell} ${styles.mono}`}>
+              <div className={`${styles.cell} ${styles.mono} ${styles.num}`}>
                 v{script.version}
               </div>
               <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>

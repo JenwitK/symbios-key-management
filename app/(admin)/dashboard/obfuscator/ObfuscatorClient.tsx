@@ -156,7 +156,7 @@ export function ObfuscatorClient() {
         <div>
           <h1 className={styles.pageTitle}>Obfuscator</h1>
           <p className={styles.pageSubtitle}>
-            Proxies the MoonVeil API. The key never reaches the browser.
+            Protect your script by SYMBIOS
           </p>
         </div>
 

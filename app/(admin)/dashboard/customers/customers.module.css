@@ -1,0 +1,167 @@
+.pageTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.pageSubtitle {
+  margin-top: var(--space-2);
+  color: var(--text-dim);
+  font-size: 0.9375rem;
+}
+
+.filters {
+  margin-top: var(--space-5);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.input {
+  min-width: 0;
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--text-mute);
+}
+
+.filterButton {
+  height: 38px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--text);
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filterButton:hover {
+  background: var(--text-dim);
+  border-color: var(--text-dim);
+}
+
+.empty {
+  margin-top: var(--space-6);
+  text-align: center;
+  color: var(--text-mute);
+  padding: var(--space-6) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.customerList {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.customerCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-4);
+}
+
+.customerHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.discordId {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.discordId:hover {
+  color: var(--text-dim);
+}
+
+.keyCount {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-mute);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.3fr)
+    minmax(90px, 0.8fr)
+    minmax(90px, 0.8fr)
+    minmax(90px, 0.6fr)
+    minmax(130px, 0.9fr)
+    minmax(150px, 1fr);
+  min-width: 700px;
+  font-size: 0.875rem;
+}
+
+.headerCell {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.time {
+  white-space: nowrap;
+}

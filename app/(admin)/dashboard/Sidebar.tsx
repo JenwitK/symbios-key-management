@@ -3,8 +3,11 @@ import styles from "./dashboard.module.css";
 
 const NAV_ITEMS = [
   { href: "/dashboard/keys", label: "Keys" },
+  { href: "/dashboard/bulk", label: "Bulk keys" },
+  { href: "/dashboard/customers", label: "Customers" },
   { href: "/dashboard/scripts", label: "Scripts" },
   { href: "/dashboard/logs", label: "Logs" },
+  { href: "/dashboard/analytics", label: "Analytics" },
   { href: "/dashboard/settings", label: "Settings" },
 ] as const;
 

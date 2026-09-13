@@ -247,7 +247,7 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
 }
 
 .textarea:focus {

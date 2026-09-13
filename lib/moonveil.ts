@@ -119,7 +119,11 @@ export async function obfuscate(
   }
 
   const data = await res.text();
-  return { ok: true, data };
+  const withHeader = data.replace(
+    /^--\s*This script was generated using MoonVeil[^\n]*\n?/,
+    "-- This script was protected by SYMBIOS HUB\n",
+  );
+  return { ok: true, data: withHeader };
 }
 
 export async function prettify(script: string): Promise<MoonveilResult<string>> {

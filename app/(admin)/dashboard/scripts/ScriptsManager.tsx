@@ -109,7 +109,7 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
         <div>
           <h1 className={styles.pageTitle}>Scripts</h1>
           <p className={styles.pageSubtitle}>
-            Paste MoonVeil output here. Served as-is by /api/v1/validate.
+            Served as-is by /api/v1/validate.
           </p>
         </div>
         <Button

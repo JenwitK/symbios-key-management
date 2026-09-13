@@ -50,6 +50,7 @@ export async function GET() {
   const result = await getAccount();
 
   if (!result.ok) {
+    console.error(`[obf] account fetch failed status=${result.status}`);
     return NextResponse.json({ error: result.message }, { status: result.status });
   }
 

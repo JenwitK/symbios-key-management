@@ -30,7 +30,7 @@ type RunError = {
 
 export function ObfuscatorClient() {
   const [account, setAccount] = useState<MoonveilAccount | null>(null);
-  const [accountError, setAccountError] = useState<string | null>(null);
+  const [accountUnavailable, setAccountUnavailable] = useState(false);
 
   const [mode, setMode] = useState<Mode>("obf");
   const [script, setScript] = useState("");
@@ -58,12 +58,12 @@ export function ObfuscatorClient() {
         const json: { account?: MoonveilAccount; error?: string } = await res.json();
         if (cancelled) return;
         if (!res.ok) {
-          setAccountError(json.error ?? "Could not load MoonVeil account.");
+          setAccountUnavailable(true);
           return;
         }
         setAccount(json.account ?? null);
       } catch {
-        if (!cancelled) setAccountError("Could not reach MoonVeil.");
+        if (!cancelled) setAccountUnavailable(true);
       }
     }
 
@@ -167,8 +167,8 @@ export function ObfuscatorClient() {
                 {account.usage.used} / {account.usage.quota} today
               </span>
             </>
-          ) : accountError ? (
-            <span className={styles.error}>{accountError}</span>
+          ) : accountUnavailable ? (
+            <span className={styles.muted}>Quota unavailable</span>
           ) : (
             <span className={styles.muted}>Loading account...</span>
           )}

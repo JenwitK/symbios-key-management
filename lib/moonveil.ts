@@ -1,10 +1,11 @@
 const BASE_URL = "https://moonveil.cc/api/v2";
+const ACCOUNT_URL = "https://moonveil.cc/api/account";
 
 export type MoonveilPlan = {
   name: string;
   maxScriptChars: number;
   dailyQuota: number;
-  allowedOptions: string[];
+  allowedOptions: { vms: VmType[]; compileTypes: CompileType[] };
 };
 
 export type MoonveilUsage = {
@@ -66,8 +67,8 @@ function statusMessage(status: number): string {
   }
 }
 
-async function moonveilFetch(path: string, init: RequestInit): Promise<Response> {
-  return fetch(`${BASE_URL}${path}`, {
+async function moonveilFetch(url: string, init: RequestInit): Promise<Response> {
+  return fetch(url, {
     ...init,
     headers: {
       ...init.headers,
@@ -93,7 +94,7 @@ async function errorResult<T>(res: Response): Promise<MoonveilResult<T>> {
 }
 
 export async function getAccount(): Promise<MoonveilResult<MoonveilAccount>> {
-  const res = await moonveilFetch("/account", { method: "GET" });
+  const res = await moonveilFetch(ACCOUNT_URL, { method: "GET" });
 
   if (!res.ok) {
     return errorResult(res);
@@ -107,7 +108,7 @@ export async function obfuscate(
   script: string,
   options?: ObfOptions,
 ): Promise<MoonveilResult<string>> {
-  const res = await moonveilFetch("/obf", {
+  const res = await moonveilFetch(`${BASE_URL}/obf`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ script, options: options ?? {} }),
@@ -122,7 +123,7 @@ export async function obfuscate(
 }
 
 export async function prettify(script: string): Promise<MoonveilResult<string>> {
-  const res = await moonveilFetch("/prettify", {
+  const res = await moonveilFetch(`${BASE_URL}/prettify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ script }),
@@ -137,7 +138,7 @@ export async function prettify(script: string): Promise<MoonveilResult<string>> 
 }
 
 export async function minify(script: string): Promise<MoonveilResult<string>> {
-  const res = await moonveilFetch("/minify", {
+  const res = await moonveilFetch(`${BASE_URL}/minify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ script }),

@@ -20,7 +20,8 @@ type ValidateReason =
   | "expired"
   | "no_access"
   | "hwid_mismatch"
-  | "key_required";
+  | "key_required"
+  | "server_error";
 
 async function logAttempt(
   adminClient: ReturnType<typeof createAdminClient>,
@@ -61,13 +62,41 @@ export async function POST(request: NextRequest) {
   const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
   const adminClient = createAdminClient();
 
-  const { data: scriptRow } = await adminClient
+  const { data: scriptRow, error: scriptErr } = await adminClient
     .from("scripts")
     .select("id, content, keyless")
     .eq("slug", scriptSlug)
     .maybeSingle();
 
+  if (scriptErr) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: null,
+      hwid,
+      ip,
+      result: "server_error",
+    });
+    return NextResponse.json(
+      { success: false, reason: "server_error" },
+      { status: 503 },
+    );
+  }
+
   if (scriptRow?.keyless === true) {
+    if (typeof scriptRow.content !== "string" || scriptRow.content.length === 0) {
+      await logAttempt(adminClient, {
+        keyId: null,
+        scriptId: scriptRow.id as string,
+        hwid,
+        ip,
+        result: "server_error",
+      });
+      return NextResponse.json(
+        { success: false, reason: "server_error" },
+        { status: 500 },
+      );
+    }
+
     await logAttempt(adminClient, {
       keyId: null,
       scriptId: scriptRow.id as string,
@@ -89,11 +118,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, reason: "key_required" });
   }
 
-  const { data: key } = await adminClient
+  const { data: key, error: keyErr } = await adminClient
     .from("keys")
     .select("id, status, hwid, expires_at")
     .eq("key_value", keyValue)
     .maybeSingle();
+
+  if (keyErr) {
+    await logAttempt(adminClient, {
+      keyId: null,
+      scriptId: scriptRow?.id ?? null,
+      hwid,
+      ip,
+      result: "server_error",
+    });
+    return NextResponse.json(
+      { success: false, reason: "server_error" },
+      { status: 503 },
+    );
+  }
 
   if (!key) {
     await logAttempt(adminClient, {
@@ -127,12 +170,26 @@ export async function POST(request: NextRequest) {
     if (!scriptRow) {
       reason = "no_access";
     } else {
-      const { data: access } = await adminClient
+      const { data: access, error: accessErr } = await adminClient
         .from("key_scripts")
         .select("key_id")
         .eq("key_id", key.id as string)
         .eq("script_id", scriptRow.id as string)
         .maybeSingle();
+
+      if (accessErr) {
+        await logAttempt(adminClient, {
+          keyId: key.id as string,
+          scriptId: scriptRow.id as string,
+          hwid,
+          ip,
+          result: "server_error",
+        });
+        return NextResponse.json(
+          { success: false, reason: "server_error" },
+          { status: 503 },
+        );
+      }
 
       if (!access) {
         reason = "no_access";
@@ -150,7 +207,7 @@ export async function POST(request: NextRequest) {
       // Without the `.is("hwid", null)` guard, two devices racing on first
       // use could both read hwid=null and both "win" an unconditional
       // update, binding the same key to two machines.
-      const { data: bound } = await adminClient
+      const { data: bound, error: bindErr } = await adminClient
         .from("keys")
         .update({
           hwid,
@@ -162,17 +219,48 @@ export async function POST(request: NextRequest) {
         .select("hwid")
         .maybeSingle();
 
+      if (bindErr) {
+        await logAttempt(adminClient, {
+          keyId: key.id as string,
+          scriptId: script.id,
+          hwid,
+          ip,
+          result: "server_error",
+        });
+        return NextResponse.json(
+          { success: false, reason: "server_error" },
+          { status: 503 },
+        );
+      }
+
       if (bound) {
         hwidAlreadyWritten = true;
       } else {
         // Lost the race — someone else bound first. Re-read and compare.
-        const { data: current } = await adminClient
+        const { data: current, error: rereadErr } = await adminClient
           .from("keys")
           .select("hwid")
           .eq("id", key.id as string)
           .maybeSingle();
 
-        if (current?.hwid !== hwid) {
+        if (rereadErr) {
+          await logAttempt(adminClient, {
+            keyId: key.id as string,
+            scriptId: script.id,
+            hwid,
+            ip,
+            result: "server_error",
+          });
+          return NextResponse.json(
+            { success: false, reason: "server_error" },
+            { status: 503 },
+          );
+        }
+
+        // Only flag a mismatch when the re-read actually came back with a
+        // non-null hwid that differs — a null/missing value here just means
+        // the bind didn't land this time, not that another device owns it.
+        if (current?.hwid != null && current.hwid !== hwid) {
           reason = "hwid_mismatch";
         }
       }

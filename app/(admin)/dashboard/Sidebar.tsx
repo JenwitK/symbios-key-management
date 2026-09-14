@@ -22,6 +22,7 @@ const NAV_SECTIONS = [
     label: "Insights",
     items: [
       { href: "/dashboard/logs", label: "Logs" },
+      { href: "/dashboard/activity", label: "Activity" },
       { href: "/dashboard/analytics", label: "Analytics" },
     ],
   },

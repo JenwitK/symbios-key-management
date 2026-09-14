@@ -27,7 +27,10 @@ const NAV_SECTIONS = [
   },
   {
     label: "System",
-    items: [{ href: "/dashboard/settings", label: "Settings" }],
+    items: [
+      { href: "/dashboard/playground", label: "Playground" },
+      { href: "/dashboard/settings", label: "Settings" },
+    ],
   },
 ] as const;
 

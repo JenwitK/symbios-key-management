@@ -161,12 +161,14 @@
 }
 
 .row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px auto minmax(0, 1fr) 190px 120px 150px;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
   border-bottom: 1px solid var(--border);
 }
+/* columns = time, result, slug, key, hwid, ip */
 
 .row:last-child {
   border-bottom: none;
@@ -224,8 +226,7 @@
 }
 
 .time {
-  flex-shrink: 0;
-  width: 40px;
+  width: auto;
   white-space: nowrap;
   color: var(--text-mute);
 }
@@ -235,30 +236,29 @@
 }
 
 .slug {
-  flex: 1;
   min-width: 0;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .key {
-  flex-shrink: 0;
   min-width: 0;
-  overflow-wrap: anywhere;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .hwid {
-  flex-shrink: 0;
-  min-width: 100px;
+  min-width: 0;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--text-dim);
 }
 
 .ip {
-  flex-shrink: 0;
   min-width: 0;
-  overflow-wrap: anywhere;
   text-align: right;
+  white-space: nowrap;
 }
 
 .empty {

@@ -233,15 +233,20 @@
   color: var(--text-mute);
 }
 
+.result {
+  min-width: 0;
+}
+
 .slug {
   flex: 1;
-  min-width: 120px;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .key {
   flex-shrink: 0;
-  min-width: 140px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .hwid {
@@ -254,7 +259,8 @@
 
 .ip {
   flex-shrink: 0;
-  min-width: 90px;
+  min-width: 0;
+  overflow-wrap: anywhere;
   text-align: right;
 }
 
@@ -267,5 +273,51 @@
 @media (max-width: 720px) {
   .statStrip {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .feed {
+    min-width: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "time  result"
+      "slug  slug"
+      "key   ip"
+      "hwid  hwid";
+    column-gap: var(--space-3);
+    row-gap: var(--space-1);
+    align-items: center;
+  }
+
+  .time {
+    grid-area: time;
+    width: auto;
+  }
+
+  .result {
+    grid-area: result;
+    justify-self: end;
+  }
+
+  .slug {
+    grid-area: slug;
+  }
+
+  .key {
+    grid-area: key;
+  }
+
+  .ip {
+    grid-area: ip;
+    text-align: left;
+  }
+
+  .hwid {
+    grid-area: hwid;
   }
 }

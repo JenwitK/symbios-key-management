@@ -290,7 +290,9 @@ export function ActivityFeed({ initialRows, initialLatestId }: ActivityFeedProps
                 >
                   {relativeTime(now, row.created_at)}
                 </span>
-                <Badge tone={RESULT_TONE[row.result] ?? "neutral"}>{row.result}</Badge>
+                <span className={styles.result}>
+                  <Badge tone={RESULT_TONE[row.result] ?? "neutral"}>{row.result}</Badge>
+                </span>
                 <span className={`${styles.mono} ${styles.slug}`}>
                   {row.script_slug ?? "-"}
                 </span>

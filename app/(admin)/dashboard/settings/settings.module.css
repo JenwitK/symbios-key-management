@@ -59,6 +59,61 @@
   border-color: var(--text-mute);
 }
 
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: var(--space-4);
+}
+
+.toggleText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.toggleHelp {
+  color: var(--text-mute);
+  font-size: 0.8125rem;
+}
+
+.switch {
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.switchOn {
+  background: var(--text);
+  border-color: var(--text);
+  justify-content: flex-end;
+}
+
+.switchThumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: background 0.15s ease;
+}
+
+.switchOn .switchThumb {
+  background: var(--bg);
+}
+
 .error {
   font-family: var(--font-mono);
   font-size: 0.8125rem;

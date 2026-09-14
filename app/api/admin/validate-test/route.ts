@@ -22,7 +22,8 @@ type ValidateReason =
   | "hwid_mismatch"
   | "key_required"
   | "server_error"
-  | "unknown_script";
+  | "unknown_script"
+  | "maintenance";
 
 type LoaderResponse =
   | { success: true; script: string }
@@ -67,6 +68,24 @@ export async function POST(request: NextRequest) {
   const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
   const adminClient = auth.adminClient;
   const trace: string[] = [];
+
+  const { data: settingsRow } = await adminClient
+    .from("settings")
+    .select("maintenance")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (settingsRow?.maintenance) {
+    trace.push("maintenance mode is ON");
+    return respond(
+      "maintenance",
+      503,
+      { success: false, reason: "maintenance" },
+      null,
+      null,
+      trace,
+    );
+  }
 
   const { data: scriptRow, error: scriptErr } = await adminClient
     .from("scripts")

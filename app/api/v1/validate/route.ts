@@ -64,6 +64,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  const adminClient = createAdminClient();
+
+  const { data: settingsRow } = await adminClient
+    .from("settings")
+    .select("maintenance")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (settingsRow?.maintenance) {
+    // No log entry here on purpose: a maintenance window would otherwise
+    // flood validation_logs with one row per loader call for its duration.
+    return NextResponse.json(
+      { success: false, reason: "maintenance" },
+      { status: 503 },
+    );
+  }
+
   const body: unknown = await request.json().catch(() => null);
   const parsed = validateSchema.safeParse(body);
 
@@ -75,7 +92,6 @@ export async function POST(request: NextRequest) {
   }
 
   const { key: keyValue, hwid, script_slug: scriptSlug } = parsed.data;
-  const adminClient = createAdminClient();
 
   const { data: scriptRow, error: scriptErr } = await withRetry(() =>
     adminClient

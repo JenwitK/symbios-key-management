@@ -7,7 +7,7 @@ export default async function SettingsPage() {
   const { data } = await adminClient
     .from("settings")
     .select(
-      "key_prefix, default_reset_limit, discord_url, announce_auto_secs",
+      "key_prefix, default_reset_limit, discord_url, announce_auto_secs, maintenance",
     )
     .eq("id", 1)
     .maybeSingle();
@@ -19,6 +19,7 @@ export default async function SettingsPage() {
       (data?.discord_url as string | undefined) ??
       "https://discord.gg/RWbYvbyB2",
     announce_auto_secs: (data?.announce_auto_secs as number | undefined) ?? 15,
+    maintenance: (data?.maintenance as boolean | undefined) ?? false,
   };
 
   return (
@@ -33,6 +34,7 @@ export default async function SettingsPage() {
         initialDefaultResetLimit={settings.default_reset_limit}
         initialDiscordUrl={settings.discord_url}
         initialAnnounceAutoSecs={settings.announce_auto_secs}
+        initialMaintenance={settings.maintenance}
       />
     </div>
   );

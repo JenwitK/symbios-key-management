@@ -13,6 +13,7 @@ const updateSettingsSchema = z.object({
   default_reset_limit: z.number().int().min(0).max(999).optional(),
   discord_url: z.string().trim().url().optional(),
   announce_auto_secs: z.number().int().min(0).optional(),
+  maintenance: z.boolean().optional(),
 });
 
 export async function PATCH(request: NextRequest) {

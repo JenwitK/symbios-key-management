@@ -10,6 +10,7 @@ type SettingsFormProps = {
   initialDefaultResetLimit: number;
   initialDiscordUrl: string;
   initialAnnounceAutoSecs: number;
+  initialMaintenance: boolean;
 };
 
 export function SettingsForm({
@@ -17,11 +18,13 @@ export function SettingsForm({
   initialDefaultResetLimit,
   initialDiscordUrl,
   initialAnnounceAutoSecs,
+  initialMaintenance,
 }: SettingsFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [maintenance, setMaintenance] = useState(initialMaintenance);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,6 +51,7 @@ export function SettingsForm({
           announce_auto_secs: Number.isFinite(announceAutoSecs)
             ? announceAutoSecs
             : undefined,
+          maintenance,
         }),
       });
 
@@ -115,6 +119,26 @@ export function SettingsForm({
             className={styles.input}
           />
         </label>
+      </div>
+
+      <div className={styles.toggleRow}>
+        <div className={styles.toggleText}>
+          <span className={styles.label}>Maintenance mode</span>
+          <p className={styles.toggleHelp}>
+            When on, all games show the maintenance screen and no scripts are served.
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={maintenance}
+          className={
+            maintenance ? `${styles.switch} ${styles.switchOn}` : styles.switch
+          }
+          onClick={() => setMaintenance((current) => !current)}
+        >
+          <span className={styles.switchThumb} />
+        </button>
       </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}

@@ -5,6 +5,8 @@ import { createClient as createServerClient } from "@/lib/supabase/server";
 export type UserSession = {
   userId: string;
   discordId: string;
+  username: string | null;
+  avatarUrl: string | null;
 };
 
 /**
@@ -28,6 +30,42 @@ function extractDiscordId(user: User): string | null {
     discordIdentity?.identity_data?.sub;
 
   return typeof fromIdentity === "string" && fromIdentity ? fromIdentity : null;
+}
+
+/**
+ * Discord OAuth metadata isn't strongly typed by supabase-js, so narrow from
+ * unknown rather than trusting one shape. Display name priority:
+ * custom_claims.global_name -> full_name -> name -> user_name ->
+ * preferred_username -> null.
+ */
+function extractProfile(
+  metadata: unknown,
+): { username: string | null; avatarUrl: string | null } {
+  if (typeof metadata !== "object" || metadata === null) {
+    return { username: null, avatarUrl: null };
+  }
+
+  const meta = metadata as Record<string, unknown>;
+
+  const customClaims = meta.custom_claims;
+  const globalName =
+    typeof customClaims === "object" &&
+    customClaims !== null &&
+    typeof (customClaims as Record<string, unknown>).global_name === "string"
+      ? ((customClaims as Record<string, unknown>).global_name as string)
+      : null;
+
+  const username =
+    globalName ??
+    (typeof meta.full_name === "string" ? meta.full_name : null) ??
+    (typeof meta.name === "string" ? meta.name : null) ??
+    (typeof meta.user_name === "string" ? meta.user_name : null) ??
+    (typeof meta.preferred_username === "string" ? meta.preferred_username : null) ??
+    null;
+
+  const avatarUrl = typeof meta.avatar_url === "string" ? meta.avatar_url : null;
+
+  return { username, avatarUrl };
 }
 
 /** Logged in AND has a Discord identity; null otherwise. */
@@ -55,7 +93,8 @@ export async function getUserSession(): Promise<UserSession | null> {
     null;
 
   if (fromMetadata) {
-    return { userId, discordId: fromMetadata };
+    const { username, avatarUrl } = extractProfile(claims.user_metadata);
+    return { userId, discordId: fromMetadata, username, avatarUrl };
   }
 
   // Fall back to one network getUser() only when the token didn't carry the
@@ -72,7 +111,8 @@ export async function getUserSession(): Promise<UserSession | null> {
     return null;
   }
 
-  return { userId, discordId };
+  const { username, avatarUrl } = extractProfile(user.user_metadata);
+  return { userId, discordId, username, avatarUrl };
 }
 
 type RequireUserResult =

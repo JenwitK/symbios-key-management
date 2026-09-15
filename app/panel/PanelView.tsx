@@ -35,6 +35,8 @@ type PanelViewProps = {
   keys: PanelKeyRow[];
   scriptsByKey: Record<string, ScriptAccess[]>;
   announcements: AnnouncementRow[];
+  username: string | null;
+  avatarUrl: string | null;
 };
 
 const STATUS_TONE: Record<
@@ -76,7 +78,13 @@ function nextExpiryLabel(keys: PanelKeyRow[]) {
   return `in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
 }
 
-export function PanelView({ keys, scriptsByKey, announcements }: PanelViewProps) {
+export function PanelView({
+  keys,
+  scriptsByKey,
+  announcements,
+  username,
+  avatarUrl,
+}: PanelViewProps) {
   const router = useRouter();
   const [linkValue, setLinkValue] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
@@ -182,9 +190,27 @@ export function PanelView({ keys, scriptsByKey, announcements }: PanelViewProps)
     <div className={styles.stack}>
       <div className={styles.toolbar}>
         <h1 className={styles.pageTitle}>Your keys</h1>
-        <button type="button" className={styles.linkButton} onClick={handleSignOut}>
-          Sign out
-        </button>
+        <div className={styles.account}>
+          <div className={styles.profile}>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt=""
+                className={styles.avatar}
+                width={24}
+                height={24}
+              />
+            ) : (
+              <span className={styles.avatarFallback}>
+                {(username ?? "?").slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <span className={styles.username}>{username ?? "Discord user"}</span>
+          </div>
+          <button type="button" className={styles.signOut} onClick={handleSignOut}>
+            Sign out
+          </button>
+        </div>
       </div>
 
       {keys.length > 0 ? (

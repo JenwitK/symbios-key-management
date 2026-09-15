@@ -82,6 +82,8 @@ export default async function PanelPage() {
           keys={keys}
           scriptsByKey={scriptsByKey}
           announcements={announcements}
+          username={session.username}
+          avatarUrl={session.avatarUrl}
         />
       </main>
       <Footer />

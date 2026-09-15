@@ -217,7 +217,7 @@
     min-width: 0;
   }
 
-  .headerRow {
+  .row.headerRow {
     display: none;
   }
 

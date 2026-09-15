@@ -188,130 +188,149 @@ export function SettingsForm({
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.formRow}>
-        <label className={styles.field}>
-          <span className={styles.label}>Key prefix</span>
-          <input
-            name="key_prefix"
-            type="text"
-            defaultValue={initialKeyPrefix}
-            required
-            className={styles.input}
-          />
-        </label>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Keys</h2>
+        </div>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Default HWID reset limit</span>
-          <input
-            name="default_reset_limit"
-            type="number"
-            min={0}
-            defaultValue={initialDefaultResetLimit}
-            required
-            className={styles.input}
-          />
-        </label>
+        <div className={styles.formRow}>
+          <label className={styles.field}>
+            <span className={styles.label}>Key prefix</span>
+            <input
+              name="key_prefix"
+              type="text"
+              defaultValue={initialKeyPrefix}
+              required
+              className={styles.input}
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Default HWID reset limit</span>
+            <input
+              name="default_reset_limit"
+              type="number"
+              min={0}
+              defaultValue={initialDefaultResetLimit}
+              required
+              className={styles.input}
+            />
+          </label>
+        </div>
       </div>
 
-      <div className={styles.formRow}>
-        <label className={styles.field}>
-          <span className={styles.label}>Discord URL</span>
-          <input
-            name="discord_url"
-            type="text"
-            defaultValue={initialDiscordUrl}
-            required
-            className={styles.input}
-          />
-        </label>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Announcements</h2>
+        </div>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Auto-close seconds</span>
-          <input
-            name="announce_auto_secs"
-            type="number"
-            min={0}
-            defaultValue={initialAnnounceAutoSecs}
-            required
-            className={styles.input}
-          />
-        </label>
+        <div className={styles.formRow}>
+          <label className={styles.field}>
+            <span className={styles.label}>Discord URL</span>
+            <input
+              name="discord_url"
+              type="text"
+              defaultValue={initialDiscordUrl}
+              required
+              className={styles.input}
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Auto-close seconds</span>
+            <input
+              name="announce_auto_secs"
+              type="number"
+              min={0}
+              defaultValue={initialAnnounceAutoSecs}
+              required
+              className={styles.input}
+            />
+          </label>
+        </div>
       </div>
 
-      <div className={styles.toggleRow}>
-        <div className={styles.toggleText}>
-          <span className={styles.label}>Maintenance mode</span>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Maintenance</h2>
+        </div>
+
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleText}>
+            <span className={styles.label}>Maintenance mode</span>
+            <p className={styles.toggleHelp}>
+              When on, all games show the maintenance screen and no scripts are served.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={maintenance}
+            className={
+              maintenance ? `${styles.switch} ${styles.switchOn}` : styles.switch
+            }
+            onClick={() => setMaintenance((current) => !current)}
+          >
+            <span className={styles.switchThumb} />
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Discord alerts</h2>
           <p className={styles.toggleHelp}>
-            When on, all games show the maintenance screen and no scripts are served.
+            Webhook and rule thresholds can be changed at any time, this does not affect
+            the loader.
           </p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={maintenance}
-          className={
-            maintenance ? `${styles.switch} ${styles.switchOn}` : styles.switch
-          }
-          onClick={() => setMaintenance((current) => !current)}
-        >
-          <span className={styles.switchThumb} />
-        </button>
-      </div>
 
-      <div className={styles.sectionDivider}>
-        <h2 className={styles.sectionTitle}>Discord alerts</h2>
-        <p className={styles.toggleHelp}>
-          Webhook and rule thresholds can be changed at any time, this does not affect
-          the loader.
-        </p>
-      </div>
+        <label className={styles.field}>
+          <span className={styles.label}>Webhook URL</span>
+          <input
+            type="url"
+            value={alertWebhookUrl}
+            onChange={(event) => setAlertWebhookUrl(event.target.value)}
+            placeholder="https://discord.com/api/webhooks/..."
+            className={styles.input}
+          />
+        </label>
 
-      <label className={styles.field}>
-        <span className={styles.label}>Webhook URL</span>
-        <input
-          type="url"
-          value={alertWebhookUrl}
-          onChange={(event) => setAlertWebhookUrl(event.target.value)}
-          placeholder="https://discord.com/api/webhooks/..."
-          className={styles.input}
-        />
-      </label>
-
-      <div className={styles.testRow}>
-        <Button type="button" variant="ghost" disabled={isTesting} onClick={handleSendTest}>
-          {isTesting ? "Sending..." : "Send test"}
-        </Button>
-        {testResult?.ok ? (
-          <span className={styles.saved}>Sent, check Discord.</span>
-        ) : null}
-        {testResult && !testResult.ok ? (
-          <span className={styles.error}>{testResult.message}</span>
-        ) : null}
-      </div>
-
-      <div className={styles.toggleRow}>
-        <div className={styles.toggleText}>
-          <span className={styles.label}>Enable alerts</span>
-          <p className={styles.toggleHelp}>
-            Master switch. When off, the scanner sends nothing regardless of the rules
-            below.
-          </p>
+        <div className={styles.testRow}>
+          <Button type="button" variant="ghost" disabled={isTesting} onClick={handleSendTest}>
+            {isTesting ? "Sending..." : "Send test"}
+          </Button>
+          {testResult?.ok ? (
+            <span className={styles.saved}>Sent, check Discord.</span>
+          ) : null}
+          {testResult && !testResult.ok ? (
+            <span className={styles.error}>{testResult.message}</span>
+          ) : null}
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={alertsEnabled}
-          className={
-            alertsEnabled ? `${styles.switch} ${styles.switchOn}` : styles.switch
-          }
-          onClick={() => setAlertsEnabled((current) => !current)}
-        >
-          <span className={styles.switchThumb} />
-        </button>
-      </div>
 
-      <div className={styles.ruleList}>
-        <div className={styles.ruleRow}>
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleText}>
+            <span className={styles.label}>Enable alerts</span>
+            <p className={styles.toggleHelp}>
+              Master switch. When off, the scanner sends nothing regardless of the rules
+              below.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={alertsEnabled}
+            className={
+              alertsEnabled ? `${styles.switch} ${styles.switchOn}` : styles.switch
+            }
+            onClick={() => setAlertsEnabled((current) => !current)}
+          >
+            <span className={styles.switchThumb} />
+          </button>
+        </div>
+
+        <div className={styles.ruleList}>
+          <div className={styles.ruleRow}>
           <label className={styles.ruleToggle}>
             <input
               type="checkbox"
@@ -525,14 +544,17 @@ export function SettingsForm({
             <span className={styles.ruleName}>First activation</span>
           </label>
         </div>
+          </div>
       </div>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
-      {saved ? <p className={styles.saved}>Saved.</p> : null}
+      <div className={styles.footer}>
+        {error ? <p className={styles.error}>{error}</p> : null}
+        {saved ? <p className={styles.saved}>Saved.</p> : null}
 
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving…" : "Save settings"}
-      </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving…" : "Save settings"}
+        </Button>
+      </div>
     </form>
   );
 }

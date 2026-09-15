@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SYMBIOS Settings mockup</title>
+<style>
+  :root{
+    --bg:#0A0A0B; --surface:#141416; --surface-2:#1C1C1F;
+    --border:rgba(255,255,255,.08); --text:#FAFAFA; --text-dim:#8A8A8F; --text-mute:#5A5A5F;
+    --ok:#3FB950; --radius:14px; --radius-sm:8px;
+    --mono:ui-monospace,"JetBrains Mono","Geist Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --sp1:6px; --sp2:10px; --sp3:14px; --sp4:18px; --sp5:22px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);
+    background-image:
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size:40px 40px;
+    min-height:100vh;
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border)}
+  .wordmark{font-family:var(--sans);font-weight:800;letter-spacing:.02em}
+  .wordmark span{color:var(--text-mute)}
+  .navbtns{display:flex;gap:10px}
+  .navbtn{border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:13px;padding:8px 14px;border-radius:var(--radius-sm);font-family:var(--sans)}
+  .wrap{max-width:1080px;margin:0 auto;padding:34px 28px 80px}
+  h1{font-family:var(--sans);font-weight:800;font-size:2rem;margin:0}
+  .sub{color:var(--text-dim);margin:8px 0 26px;font-size:.95rem}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:20px}
+  .section{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:22px}
+  .stitle{font-family:var(--sans);font-weight:700;font-size:1.05rem;margin:0 0 4px}
+  .shelp{color:var(--text-dim);font-size:.82rem;margin:0 0 16px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .label{font-family:var(--mono);font-size:.72rem;color:var(--text-dim);text-transform:none}
+  .input{height:38px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);padding:0 12px;font-family:var(--sans);font-size:.9rem}
+  .mono{font-family:var(--mono)}
+  .toggleRow{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .toggleText .label{display:block;margin-bottom:4px}
+  .toggleText p{margin:0;color:var(--text-dim);font-size:.8rem;max-width:42ch}
+  .switch{width:42px;height:24px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);position:relative;flex:none}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--text-mute)}
+  .switch.on{background:var(--text);border-color:var(--text)}
+  .switch.on::after{left:auto;right:2px;background:var(--bg)}
+  .divider{height:1px;background:var(--border);margin:18px 0}
+  .rule{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:12px}
+  .rule:first-of-type{margin-top:0}
+  .ruleHead{display:flex;align-items:center;gap:10px}
+  .cb{width:16px;height:16px;accent-color:var(--text)}
+  .ruleName{font-family:var(--mono);font-size:.82rem}
+  .ruleFields{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+  .rf{display:flex;flex-direction:column;gap:6px}
+  .rf .label{font-size:.66rem}
+  .num{width:84px;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);padding:0 8px;font-family:var(--mono);font-size:.8rem}
+  .ghost{border:1px solid var(--border);background:transparent;color:var(--text);font-family:var(--mono);font-size:.78rem;padding:8px 14px;border-radius:var(--radius-sm)}
+  .footer{display:flex;align-items:center;gap:16px;margin-top:22px}
+  .save{background:var(--text);color:var(--bg);border:none;font-weight:600;padding:11px 20px;border-radius:var(--radius-sm);font-family:var(--sans)}
+  .testrow{display:flex;align-items:center;gap:14px;margin-top:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <div class="wordmark">SYM<span>BIOS</span></div>
+    <div class="navbtns"><button class="navbtn">↻ Refresh</button><button class="navbtn">Log out</button></div>
+  </div>
+
+  <div class="wrap">
+    <h1>Settings</h1>
+    <p class="sub">Key format, default HWID resets, announcement config, and Discord alerts.</p>
+
+    <div class="grid">
+      <!-- LEFT column: short cards -->
+      <div class="col">
+        <div class="section">
+          <h2 class="stitle">Keys</h2>
+          <p class="shelp">Format and default limits for issued keys.</p>
+          <div class="row2">
+            <div class="field"><span class="label">Key prefix</span><input class="input" value="SYMBIOS"></div>
+            <div class="field"><span class="label">Default HWID reset limit</span><input class="input mono" value="3"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="stitle">Announcements</h2>
+          <p class="shelp">Loader popup: Discord link and auto-close timing.</p>
+          <div class="row2">
+            <div class="field"><span class="label">Discord URL</span><input class="input" value="https://discord.gg/RWbYvbyB2"></div>
+            <div class="field"><span class="label">Auto-close seconds</span><input class="input mono" value="15"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="stitle">Maintenance</h2>
+          <p class="shelp">Kill-switch for the whole loader.</p>
+          <div class="toggleRow">
+            <div class="toggleText"><span class="label">Maintenance mode</span><p>When on, all games show the maintenance screen and no scripts are served.</p></div>
+            <div class="switch"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT column: Discord alerts (tall) -->
+      <div class="col">
+        <div class="section">
+          <h2 class="stitle">Discord alerts</h2>
+          <p class="shelp">Webhook and rule thresholds can be changed at any time, this does not affect the loader.</p>
+
+          <div class="field"><span class="label">Webhook URL</span><input class="input" placeholder="https://discord.com/api/webhooks/..."></div>
+          <div class="testrow"><button class="ghost">Send test</button><span style="color:var(--text-mute);font-size:.8rem">check Discord after sending</span></div>
+
+          <div class="divider"></div>
+
+          <div class="toggleRow">
+            <div class="toggleText"><span class="label">Enable alerts</span><p>Master switch. When off, the scanner sends nothing.</p></div>
+            <div class="switch on"></div>
+          </div>
+
+          <div class="rule">
+            <div class="ruleHead"><input type="checkbox" class="cb" checked><span class="ruleName">HWID mismatch spike</span></div>
+            <div class="ruleFields">
+              <div class="rf"><span class="label">Threshold</span><input class="num" value="10"></div>
+              <div class="rf"><span class="label">Window (min)</span><input class="num" value="15"></div>
+              <div class="rf"><span class="label">Cooldown (min)</span><input class="num" value="30"></div>
+            </div>
+          </div>
+
+          <div class="rule">
+            <div class="ruleHead"><input type="checkbox" class="cb" checked><span class="ruleName">Server error spike</span></div>
+            <div class="ruleFields">
+              <div class="rf"><span class="label">Threshold</span><input class="num" value="20"></div>
+              <div class="rf"><span class="label">Window (min)</span><input class="num" value="15"></div>
+              <div class="rf"><span class="label">Cooldown (min)</span><input class="num" value="30"></div>
+            </div>
+          </div>
+
+          <div class="rule">
+            <div class="ruleHead"><input type="checkbox" class="cb" checked><span class="ruleName">Key sharing</span></div>
+            <div class="ruleFields">
+              <div class="rf"><span class="label">Distinct HWID</span><input class="num" value="2"></div>
+              <div class="rf"><span class="label">Distinct IP</span><input class="num" value="3"></div>
+              <div class="rf"><span class="label">Window (min)</span><input class="num" value="60"></div>
+              <div class="rf"><span class="label">Cooldown (min)</span><input class="num" value="120"></div>
+            </div>
+          </div>
+
+          <div class="rule">
+            <div class="ruleHead"><input type="checkbox" class="cb" checked><span class="ruleName">Banned/paused use</span></div>
+            <div class="ruleFields">
+              <div class="rf"><span class="label">Cooldown (min)</span><input class="num" value="60"></div>
+            </div>
+          </div>
+
+          <div class="rule">
+            <div class="ruleHead"><input type="checkbox" class="cb" checked><span class="ruleName">First activation</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer"><button class="save">Save settings</button></div>
+  </div>
+</body>
+</html>

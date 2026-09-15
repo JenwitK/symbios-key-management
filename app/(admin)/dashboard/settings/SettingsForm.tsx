@@ -188,7 +188,9 @@ export function SettingsForm({
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.section}>
+      <div className={styles.grid}>
+        <div className={styles.column}>
+          <div className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Keys</h2>
         </div>
@@ -275,7 +277,9 @@ export function SettingsForm({
           </button>
         </div>
       </div>
+        </div>
 
+        <div className={styles.column}>
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Discord alerts</h2>
@@ -545,6 +549,8 @@ export function SettingsForm({
           </label>
         </div>
           </div>
+      </div>
+        </div>
       </div>
 
       <div className={styles.footer}>

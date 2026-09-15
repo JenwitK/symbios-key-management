@@ -13,7 +13,20 @@
 
 .form {
   margin-top: var(--space-5);
-  max-width: 640px;
+  max-width: 1080px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.column {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -229,6 +242,12 @@
 .ruleNumberInput:focus {
   outline: none;
   border-color: var(--text-mute);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {

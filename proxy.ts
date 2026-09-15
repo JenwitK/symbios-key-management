@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const cookieOptions = {
+  maxAge: 60 * 60 * 24 * 400, // 400 days, matches refresh-token lifetime
+  sameSite: "lax" as const,
+  path: "/",
+  secure: process.env.NODE_ENV === "production",
+};
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -8,6 +15,7 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions,
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -27,7 +35,7 @@ export async function proxy(request: NextRequest) {
 
   // Touching getUser() refreshes an expired access token and persists the
   // rotated cookies via the response above. Server Components can't do this
-  // themselves (Next.js disallows setting cookies there — see
+  // themselves (Next.js disallows setting cookies there - see
   // lib/supabase/server.ts), so every route that reads the session in a
   // Server Component needs to be covered by the matcher below, or its
   // session silently breaks the first time the access token expires (the

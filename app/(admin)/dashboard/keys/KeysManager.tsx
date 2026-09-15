@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
@@ -72,6 +73,12 @@ export function KeysManager({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkPending, setIsBulkPending] = useState(false);
+  const [bulkError, setBulkError] = useState<string | null>(null);
+  const [extendDays, setExtendDays] = useState(30);
+  const [expiryDate, setExpiryDate] = useState("");
+  const [expiryLifetime, setExpiryLifetime] = useState(false);
 
   const formOpen = isCreating || editing !== null;
 
@@ -79,6 +86,33 @@ export function KeysManager({
     if (statusFilter === "all") return keys;
     return keys.filter((key) => key.status === statusFilter);
   }, [keys, statusFilter]);
+
+  const allVisibleSelected =
+    visibleKeys.length > 0 && visibleKeys.every((key) => selectedIds.has(key.id));
+
+  function toggleSelectAll() {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (allVisibleSelected) {
+        for (const key of visibleKeys) next.delete(key.id);
+      } else {
+        for (const key of visibleKeys) next.add(key.id);
+      }
+      return next;
+    });
+  }
+
+  function toggleSelectOne(id: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
 
   function openCreateForm() {
     setEditing(null);
@@ -197,6 +231,118 @@ export function KeysManager({
     }
   }
 
+  async function runBulkAction(
+    body: Record<string, unknown>,
+    confirmOpts: { title: string; text?: string; confirmText: string; danger?: boolean },
+  ) {
+    const ok = await confirmDialog(confirmOpts);
+    if (!ok) return;
+
+    setBulkError(null);
+    setIsBulkPending(true);
+    try {
+      const res = await fetch("/api/admin/keys/bulk-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds), ...body }),
+      });
+
+      const json: { error?: string } = await res.json();
+
+      if (!res.ok) {
+        setBulkError(json.error ?? "Bulk action failed.");
+        return;
+      }
+
+      setSelectedIds(new Set());
+      router.refresh();
+    } finally {
+      setIsBulkPending(false);
+    }
+  }
+
+  function handleBulkActivate() {
+    const count = selectedIds.size;
+    runBulkAction(
+      { action: "set-status", status: "active" },
+      {
+        title: `Activate ${count} key${count === 1 ? "" : "s"}?`,
+        text: "They will be able to validate again.",
+        confirmText: "Activate",
+      },
+    );
+  }
+
+  function handleBulkBan() {
+    const count = selectedIds.size;
+    runBulkAction(
+      { action: "set-status", status: "banned" },
+      {
+        title: `Ban ${count} key${count === 1 ? "" : "s"}?`,
+        text: "They will stop validating immediately.",
+        confirmText: "Ban",
+        danger: true,
+      },
+    );
+  }
+
+  function handleBulkExtend() {
+    if (!Number.isFinite(extendDays) || extendDays < 1 || extendDays > 3650) return;
+    const count = selectedIds.size;
+    runBulkAction(
+      { action: "extend", days: extendDays },
+      {
+        title: `Extend ${count} key${count === 1 ? "" : "s"} by ${extendDays} day${extendDays === 1 ? "" : "s"}?`,
+        text: "Expiry moves forward from now or their current expiry, whichever is later.",
+        confirmText: "Extend",
+      },
+    );
+  }
+
+  function handleBulkSetExpiry() {
+    const count = selectedIds.size;
+    const expiresAt = expiryLifetime
+      ? null
+      : expiryDate
+        ? new Date(expiryDate).toISOString()
+        : null;
+    if (!expiryLifetime && !expiryDate) return;
+
+    runBulkAction(
+      { action: "set-expiry", expires_at: expiresAt },
+      {
+        title: `Set expiry for ${count} key${count === 1 ? "" : "s"}?`,
+        text: expiryLifetime ? "They will become lifetime keys." : `New expiry: ${expiryDate}`,
+        confirmText: "Set expiry",
+      },
+    );
+  }
+
+  function handleBulkResetHwid() {
+    const count = selectedIds.size;
+    runBulkAction(
+      { action: "reset-hwid" },
+      {
+        title: `Reset HWID for ${count} key${count === 1 ? "" : "s"}?`,
+        text: "This clears the bound HWID and does not consume reset quota.",
+        confirmText: "Reset HWID",
+      },
+    );
+  }
+
+  function handleBulkDelete() {
+    const count = selectedIds.size;
+    runBulkAction(
+      { action: "delete" },
+      {
+        title: `Delete ${count} key${count === 1 ? "" : "s"}?`,
+        text: "This cannot be undone.",
+        confirmText: "Delete",
+        danger: true,
+      },
+    );
+  }
+
   return (
     <div>
       <div className={styles.toolbar}>
@@ -298,9 +444,10 @@ export function KeysManager({
         <span className={styles.label}>Status</span>
         <select
           value={statusFilter}
-          onChange={(event) =>
-            setStatusFilter(event.target.value as StatusFilter)
-          }
+          onChange={(event) => {
+            setStatusFilter(event.target.value as StatusFilter);
+            setSelectedIds(new Set());
+          }}
           className={styles.input}
         >
           {STATUS_FILTERS.map((status) => (
@@ -311,9 +458,126 @@ export function KeysManager({
         </select>
       </div>
 
+      {selectedIds.size > 0 ? (
+        <div className={styles.bulkBar}>
+          <span className={styles.bulkCount}>{selectedIds.size} selected</span>
+          <button
+            type="button"
+            className={styles.linkButton}
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Clear
+          </button>
+
+          <div className={styles.bulkActions}>
+            <button
+              type="button"
+              className={styles.bulkButton}
+              disabled={isBulkPending}
+              onClick={handleBulkActivate}
+            >
+              Activate
+            </button>
+            <button
+              type="button"
+              className={styles.bulkButton}
+              disabled={isBulkPending}
+              onClick={handleBulkBan}
+            >
+              Ban
+            </button>
+
+            <div className={styles.bulkInlineGroup}>
+              <input
+                type="number"
+                min={1}
+                max={3650}
+                value={extendDays}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (Number.isFinite(parsed)) {
+                    setExtendDays(Math.min(3650, parsed));
+                  }
+                }}
+                className={styles.bulkNumberInput}
+              />
+              <button
+                type="button"
+                className={styles.bulkButton}
+                disabled={
+                  isBulkPending ||
+                  !Number.isFinite(extendDays) ||
+                  extendDays < 1 ||
+                  extendDays > 3650
+                }
+                onClick={handleBulkExtend}
+              >
+                Extend (days)
+              </button>
+            </div>
+
+            <div className={styles.bulkInlineGroup}>
+              <label className={styles.bulkCheckboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={expiryLifetime}
+                  onChange={(event) => setExpiryLifetime(event.target.checked)}
+                  className={styles.checkbox}
+                />
+                Lifetime
+              </label>
+              {!expiryLifetime ? (
+                <input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(event) => setExpiryDate(event.target.value)}
+                  className={styles.bulkDateInput}
+                />
+              ) : null}
+              <button
+                type="button"
+                className={styles.bulkButton}
+                disabled={isBulkPending || (!expiryLifetime && !expiryDate)}
+                onClick={handleBulkSetExpiry}
+              >
+                Set expiry
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className={styles.bulkButton}
+              disabled={isBulkPending}
+              onClick={handleBulkResetHwid}
+            >
+              Reset HWID
+            </button>
+            <button
+              type="button"
+              className={`${styles.bulkButton} ${styles.bulkButtonDanger}`}
+              disabled={isBulkPending}
+              onClick={handleBulkDelete}
+            >
+              Delete
+            </button>
+          </div>
+
+          {bulkError ? <p className={styles.error}>{bulkError}</p> : null}
+        </div>
+      ) : null}
+
       <div className={styles.tableWrap}>
         <div className={styles.table}>
           <div className={`${styles.row} ${styles.headerRow}`}>
+            <div className={styles.headerCell}>
+              <input
+                type="checkbox"
+                checked={allVisibleSelected}
+                onChange={toggleSelectAll}
+                className={styles.checkbox}
+                aria-label="Select all"
+              />
+            </div>
             <div className={styles.headerCell}>Key</div>
             <div className={styles.headerCell}>Label</div>
             <div className={styles.headerCell}>Status</div>
@@ -328,8 +592,19 @@ export function KeysManager({
             const busy = pendingActionId === key.id;
             return (
               <div key={key.id} className={styles.row}>
+                <div className={styles.cell} data-label="Select">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(key.id)}
+                    onChange={() => toggleSelectOne(key.id)}
+                    className={styles.checkbox}
+                    aria-label={`Select ${key.key_value}`}
+                  />
+                </div>
                 <div className={`${styles.cell} ${styles.mono}`} data-label="Key">
-                  {key.key_value}
+                  <Link href={`/dashboard/keys/${key.id}`} className={styles.keyLink}>
+                    {key.key_value}
+                  </Link>
                 </div>
                 <div className={styles.cell} data-label="Label">
                   {key.label || "-"}

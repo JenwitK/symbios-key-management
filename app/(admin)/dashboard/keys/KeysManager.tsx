@@ -313,7 +313,7 @@ export function KeysManager({
 
       <div className={styles.tableWrap}>
         <div className={styles.table}>
-          <div className={styles.row}>
+          <div className={`${styles.row} ${styles.headerRow}`}>
             <div className={styles.headerCell}>Key</div>
             <div className={styles.headerCell}>Label</div>
             <div className={styles.headerCell}>Status</div>
@@ -328,23 +328,31 @@ export function KeysManager({
             const busy = pendingActionId === key.id;
             return (
               <div key={key.id} className={styles.row}>
-                <div className={`${styles.cell} ${styles.mono}`}>
+                <div className={`${styles.cell} ${styles.mono}`} data-label="Key">
                   {key.key_value}
                 </div>
-                <div className={styles.cell}>{key.label || "-"}</div>
-                <div className={styles.cell}>
+                <div className={styles.cell} data-label="Label">
+                  {key.label || "-"}
+                </div>
+                <div className={styles.cell} data-label="Status">
                   <Badge tone={STATUS_TONE[key.status]}>{key.status}</Badge>
                 </div>
-                <div className={`${styles.cell} ${styles.mono}`}>
+                <div className={`${styles.cell} ${styles.mono}`} data-label="HWID">
                   <HwidCell hwid={key.hwid} />
                 </div>
-                <div className={`${styles.cell} ${styles.mono}`}>
+                <div className={`${styles.cell} ${styles.mono}`} data-label="Resets">
                   {key.hwid_resets}/{key.hwid_reset_limit}
                 </div>
-                <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
+                <div
+                  className={`${styles.cell} ${styles.mono} ${styles.time}`}
+                  data-label="Last seen"
+                >
                   {formatDate(key.last_seen_at)}
                 </div>
-                <div className={`${styles.cell} ${styles.mono} ${styles.time}`}>
+                <div
+                  className={`${styles.cell} ${styles.mono} ${styles.time}`}
+                  data-label="Expires"
+                >
                   {key.expires_at ? formatDate(key.expires_at) : "Lifetime"}
                 </div>
                 <div className={styles.actionsCell}>

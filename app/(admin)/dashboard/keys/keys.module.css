@@ -207,6 +207,56 @@
   padding: var(--space-6) var(--space-3);
 }
 
+@media (max-width: 600px) {
+  .tableWrap {
+    overflow-x: visible;
+  }
+
+  .table {
+    display: block;
+    min-width: 0;
+  }
+
+  .headerRow {
+    display: none;
+  }
+
+  .row {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    border-bottom: none;
+    padding: var(--space-1) 0;
+  }
+
+  .cell::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--text-mute);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .actionsCell {
+    border-bottom: none;
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-2);
+    padding: var(--space-2) 0 0;
+  }
+}
+
 @media (max-width: 720px) {
   .formRow {
     grid-template-columns: 1fr;

@@ -175,7 +175,9 @@ export function AreaChart({ points, height = 160, ariaLabel }: AreaChartProps) {
               key={i}
               x={xAt(i)}
               y={height - 6}
-              textAnchor="middle"
+              textAnchor={
+                i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"
+              }
               className={styles.xTick}
             >
               {points[i].label}

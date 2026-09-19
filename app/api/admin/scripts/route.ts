@@ -10,7 +10,7 @@ const createSchema = z.object({
   content: z.string().optional(),
   source_content: z.string().optional(),
   obf_config: z.record(z.string(), z.unknown()).optional(),
-  status: z.enum(["active", "disabled"]).default("active"),
+  status: z.enum(["active", "maintenance"]).default("active"),
   keyless: z.boolean().optional(),
 });
 
@@ -21,7 +21,7 @@ const updateSchema = z.object({
   content: z.string().optional(),
   source_content: z.string().optional(),
   obf_config: z.record(z.string(), z.unknown()).optional(),
-  status: z.enum(["active", "disabled"]).optional(),
+  status: z.enum(["active", "maintenance"]).optional(),
   keyless: z.boolean().optional(),
 });
 

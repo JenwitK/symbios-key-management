@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
   const { data: scriptRow, error: scriptErr } = await adminClient
     .from("scripts")
-    .select("id, content, keyless")
+    .select("id, content, keyless, status")
     .eq("slug", scriptSlug)
     .maybeSingle();
 
@@ -99,6 +99,19 @@ export async function POST(request: NextRequest) {
       "server_error",
       503,
       { success: false, reason: "server_error" },
+      null,
+      null,
+      trace,
+    );
+  }
+
+  if (scriptRow && scriptRow.status === "maintenance") {
+    trace.push(`script found: ${scriptSlug}`);
+    trace.push("script is in maintenance");
+    return respond(
+      "maintenance",
+      503,
+      { success: false, reason: "maintenance" },
       null,
       null,
       trace,

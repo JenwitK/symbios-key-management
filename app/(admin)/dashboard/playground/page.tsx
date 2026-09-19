@@ -6,7 +6,7 @@ export default async function PlaygroundPage() {
   const { data } = await adminClient
     .from("scripts")
     .select("slug")
-    .eq("status", "active")
+    .in("status", ["active", "maintenance"])
     .order("slug", { ascending: true });
 
   const slugs = (data ?? []).map((row) => row.slug as string);

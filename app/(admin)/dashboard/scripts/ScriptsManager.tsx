@@ -13,7 +13,7 @@ export type ScriptRow = {
   slug: string;
   content: string | null;
   version: number;
-  status: "active" | "disabled";
+  status: "active" | "maintenance";
   keyless: boolean;
   updated_at: string;
 };
@@ -164,7 +164,7 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
                 className={styles.input}
               >
                 <option value="active">active</option>
-                <option value="disabled">disabled</option>
+                <option value="maintenance">maintenance</option>
               </select>
             </label>
           </div>
@@ -227,7 +227,7 @@ export function ScriptsManager({ scripts }: ScriptsManagerProps) {
                 {script.slug}
               </div>
               <div className={styles.cell}>
-                <Badge tone={script.status === "active" ? "ok" : "neutral"}>
+                <Badge tone={script.status === "active" ? "ok" : "warn"}>
                   {script.status}
                 </Badge>
                 {script.keyless ? (

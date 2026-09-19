@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
   const { data: scriptRow, error: scriptErr } = await withRetry(() =>
     adminClient
       .from("scripts")
-      .select("id, content, keyless")
+      .select("id, content, keyless, status")
       .eq("slug", scriptSlug)
       .maybeSingle(),
   );
@@ -112,6 +112,15 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(
       { success: false, reason: "server_error" },
+      { status: 503 },
+    );
+  }
+
+  if (scriptRow && scriptRow.status === "maintenance") {
+    // No log entry, same as the global maintenance switch: avoids flooding
+    // validation_logs while the script is down.
+    return NextResponse.json(
+      { success: false, reason: "maintenance" },
       { status: 503 },
     );
   }

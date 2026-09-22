@@ -8,6 +8,7 @@ import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
 import { CodeBlock } from "@/components/CodeBlock/CodeBlock";
 import { confirmDialog } from "@/lib/confirm";
+import { expiryCountdown } from "@/lib/datetime";
 import styles from "./panel.module.css";
 
 export type PanelKeyRow = {
@@ -51,31 +52,24 @@ const STATUS_TONE: Record<
 
 const LOADER = `loadstring(game:HttpGet("https://raw.githubusercontent.com/SYMBIOSHUB/SYMBIOS-HUB/refs/heads/main/SYMBIOS.lua"))()`;
 
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
 function formatExpiry(iso: string | null) {
   if (!iso) return "Lifetime";
-  return new Date(iso).toLocaleDateString("en-US", { dateStyle: "medium" });
-}
-
-function expiryCountdown(iso: string | null) {
-  if (!iso) return null;
-  const diffDays = Math.ceil((new Date(iso).getTime() - Date.now()) / MS_PER_DAY);
-  if (diffDays < 0) return "Expired";
-  if (diffDays === 0) return "Expires today";
-  return `in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
+  return new Date(iso).toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Bangkok",
+  });
 }
 
 function nextExpiryLabel(keys: PanelKeyRow[]) {
   const now = Date.now();
   const future = keys
-    .map((key) => (key.expires_at ? new Date(key.expires_at).getTime() : null))
-    .filter((time): time is number => time !== null && time > now)
-    .sort((a, b) => a - b);
+    .map((key) => key.expires_at)
+    .filter((iso): iso is string => iso !== null && new Date(iso).getTime() > now)
+    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
   if (future.length === 0) return "Lifetime";
-  const diffDays = Math.ceil((future[0] - now) / MS_PER_DAY);
-  return `in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
+  return expiryCountdown(future[0]) ?? "Lifetime";
 }
 
 export function PanelView({

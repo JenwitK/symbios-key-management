@@ -303,6 +303,7 @@
 }
 
 .bulkDateInput {
+  min-width: 190px;
   height: 32px;
   padding: 0 var(--space-2);
   border: 1px solid var(--border);
@@ -369,6 +370,15 @@
     border-top: 1px solid var(--border);
     margin-top: var(--space-2);
     padding: var(--space-2) 0 0;
+  }
+
+  .bulkInlineGroup {
+    flex-wrap: wrap;
+  }
+
+  .bulkDateInput {
+    min-width: 0;
+    width: 100%;
   }
 }
 

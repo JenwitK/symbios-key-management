@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
+import { expiryCountdown } from "@/lib/datetime";
 import styles from "./keyDetail.module.css";
 
 export type TimelineRow = {
@@ -44,8 +45,6 @@ const STATUS_TONE: Record<
   expired: "neutral",
 };
 
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
 function formatDate(iso: string | null) {
   if (!iso) return "-";
   return new Date(iso).toLocaleString("en-US", {
@@ -57,15 +56,11 @@ function formatDate(iso: string | null) {
 
 function formatExpiry(iso: string | null) {
   if (!iso) return "Lifetime";
-  return new Date(iso).toLocaleDateString("en-US", { dateStyle: "medium" });
-}
-
-function expiryCountdown(iso: string | null) {
-  if (!iso) return null;
-  const diffDays = Math.ceil((new Date(iso).getTime() - Date.now()) / MS_PER_DAY);
-  if (diffDays < 0) return "Expired";
-  if (diffDays === 0) return "Expires today";
-  return `in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
+  return new Date(iso).toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Bangkok",
+  });
 }
 
 export function KeyHeaderCard({

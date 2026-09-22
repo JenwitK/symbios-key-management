@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/Button/Button";
+import { fromBangkokInputValue } from "@/lib/datetime";
 import styles from "./bulk.module.css";
 
 export type ScriptOption = {
@@ -43,7 +44,7 @@ export function BulkKeys({ scripts }: BulkKeysProps) {
     const payload = {
       count,
       label: label || undefined,
-      expires_at: expiresRaw ? new Date(expiresRaw).toISOString() : null,
+      expires_at: fromBangkokInputValue(expiresRaw),
       hwid_reset_limit: hwidResetLimitRaw ? Number(hwidResetLimitRaw) : undefined,
       script_ids: selectedScriptIds,
     };
@@ -121,7 +122,7 @@ export function BulkKeys({ scripts }: BulkKeysProps) {
 
           <label className={styles.field}>
             <span className={styles.label}>Expires (blank = lifetime)</span>
-            <input name="expires_at" type="date" className={styles.input} />
+            <input name="expires_at" type="datetime-local" className={styles.input} />
           </label>
 
           <label className={styles.field}>

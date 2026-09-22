@@ -42,8 +42,9 @@ function formatDateTime(iso: string | null) {
 
 function formatExpiry(iso: string | null) {
   if (!iso) return "Lifetime";
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleString("en-US", {
     dateStyle: "medium",
+    timeStyle: "short",
     timeZone: "Asia/Bangkok",
   });
 }

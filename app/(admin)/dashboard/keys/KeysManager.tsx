@@ -7,6 +7,7 @@ import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
 import { confirmDialog } from "@/lib/confirm";
+import { toBangkokInputValue, fromBangkokInputValue } from "@/lib/datetime";
 import styles from "./keys.module.css";
 
 export type KeyStatus = "active" | "paused" | "banned" | "expired";
@@ -51,12 +52,8 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Bangkok",
   });
-}
-
-function toDateInputValue(iso: string | null) {
-  if (!iso) return "";
-  return iso.slice(0, 10);
 }
 
 export function KeysManager({
@@ -158,7 +155,7 @@ export function KeysManager({
     const payload = {
       ...(keyValue ? { key_value: keyValue } : {}),
       label: label || undefined,
-      expires_at: expiresRaw ? new Date(expiresRaw).toISOString() : null,
+      expires_at: fromBangkokInputValue(expiresRaw),
       hwid_reset_limit: Number.isFinite(hwidResetLimit)
         ? hwidResetLimit
         : undefined,
@@ -300,19 +297,17 @@ export function KeysManager({
   }
 
   function handleBulkSetExpiry() {
-    const count = selectedIds.size;
-    const expiresAt = expiryLifetime
-      ? null
-      : expiryDate
-        ? new Date(expiryDate).toISOString()
-        : null;
     if (!expiryLifetime && !expiryDate) return;
+    const count = selectedIds.size;
+    const expiresAt = expiryLifetime ? null : fromBangkokInputValue(expiryDate);
 
     runBulkAction(
       { action: "set-expiry", expires_at: expiresAt },
       {
         title: `Set expiry for ${count} key${count === 1 ? "" : "s"}?`,
-        text: expiryLifetime ? "They will become lifetime keys." : `New expiry: ${expiryDate}`,
+        text: expiryLifetime
+          ? "They will become lifetime keys."
+          : `New expiry: ${formatDate(expiresAt)}`,
         confirmText: "Set expiry",
       },
     );
@@ -389,8 +384,8 @@ export function KeysManager({
               <span className={styles.label}>Expires (blank = lifetime)</span>
               <input
                 name="expires_at"
-                type="date"
-                defaultValue={toDateInputValue(editing?.expires_at ?? null)}
+                type="datetime-local"
+                defaultValue={toBangkokInputValue(editing?.expires_at ?? null)}
                 className={styles.input}
               />
             </label>
@@ -528,7 +523,7 @@ export function KeysManager({
               </label>
               {!expiryLifetime ? (
                 <input
-                  type="date"
+                  type="datetime-local"
                   value={expiryDate}
                   onChange={(event) => setExpiryDate(event.target.value)}
                   className={styles.bulkDateInput}

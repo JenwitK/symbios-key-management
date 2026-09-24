@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button/Button";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
@@ -63,6 +63,10 @@ export function KeysManager({
   defaultResetLimit,
 }: KeysManagerProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const newParam = searchParams.get("new");
+  const customKeyInputRef = useRef<HTMLInputElement | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [isCreating, setIsCreating] = useState(false);
   const [editing, setEditing] = useState<KeyRow | null>(null);
@@ -78,6 +82,31 @@ export function KeysManager({
   const [expiryLifetime, setExpiryLifetime] = useState(false);
 
   const formOpen = isCreating || editing !== null;
+
+  // Open the create form whenever ?new=1 appears in the URL, including
+  // repeat visits on the same route (N key / palette "Create key" push the
+  // same query again without remounting this component). Sentinel-tracked
+  // and adjusted during render per React's "adjusting state when a prop
+  // changes" pattern, since a plain effect would be flagged for calling
+  // setState synchronously in its body.
+  const [prevNewParam, setPrevNewParam] = useState<string | null | undefined>(undefined);
+  if (newParam !== prevNewParam) {
+    setPrevNewParam(newParam);
+    if (newParam === "1") {
+      setEditing(null);
+      setIsCreating(true);
+      setSelectedScriptIds([]);
+      setError(null);
+    }
+  }
+
+  // Side effects only (URL cleanup + focus), no setState here.
+  useEffect(() => {
+    if (newParam !== "1") return;
+    router.replace(pathname);
+    const id = setTimeout(() => customKeyInputRef.current?.focus(), 30);
+    return () => clearTimeout(id);
+  }, [newParam, pathname, router]);
 
   const visibleKeys = useMemo(() => {
     if (statusFilter === "all") return keys;
@@ -360,6 +389,7 @@ export function KeysManager({
             <label className={styles.field}>
               <span className={styles.label}>Custom key (optional)</span>
               <input
+                ref={customKeyInputRef}
                 name="key_value"
                 type="text"
                 placeholder="blank = auto SYMBIOS-XXXX"

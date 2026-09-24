@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const bodyFont = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const displayFont = Space_Grotesk({
-  variable: "--font-space",
   subsets: ["latin"],
 });
 
@@ -24,10 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`}
-    >
+    <html lang="en" className={`${bodyFont.variable} ${monoFont.variable}`}>
       <body>{children}</body>
     </html>
   );

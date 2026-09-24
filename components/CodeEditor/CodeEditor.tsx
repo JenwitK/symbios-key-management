@@ -79,7 +79,10 @@ const editorTheme = EditorView.theme(
 export function CodeEditor({ value, onChange, placeholder }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!containerRef.current) return;

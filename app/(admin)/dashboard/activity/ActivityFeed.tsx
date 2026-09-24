@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
+import { useSyncActions } from "@/components/Sync/SyncProvider";
 import styles from "./activity.module.css";
 
 export type ActivityRow = {
@@ -87,12 +88,27 @@ export function ActivityFeed({ initialRows, initialLatestId }: ActivityFeedProps
   const [now, setNow] = useState(() => Date.now());
   const [newIds, setNewIds] = useState<Set<number>>(new Set());
 
-  const latestIdRef = useRef(latestId);
-  latestIdRef.current = latestId;
-  const liveRef = useRef(live);
-  liveRef.current = live;
+  const { setLive: setGlobalLive, markSynced } = useSyncActions();
 
-  async function fetchDelta() {
+  const latestIdRef = useRef(latestId);
+  const liveRef = useRef(live);
+
+  useEffect(() => {
+    latestIdRef.current = latestId;
+  }, [latestId]);
+
+  useEffect(() => {
+    liveRef.current = live;
+  }, [live]);
+
+  // Report to the topbar pill only while actually polling (own toggle on
+  // and tab visible); false on pause, hidden tab, or unmount.
+  useEffect(() => {
+    setGlobalLive(live && !hidden);
+    return () => setGlobalLive(false);
+  }, [live, hidden, setGlobalLive]);
+
+  const fetchDelta = useCallback(async () => {
     try {
       const after = latestIdRef.current;
       const qs = after ? `?after=${after}` : "";
@@ -106,6 +122,7 @@ export function ActivityFeed({ initialRows, initialLatestId }: ActivityFeedProps
       }
 
       setReconnecting(false);
+      markSynced();
 
       const incoming = json.rows ?? [];
       if (incoming.length === 0) return;
@@ -134,7 +151,7 @@ export function ActivityFeed({ initialRows, initialLatestId }: ActivityFeedProps
     } catch {
       setReconnecting(true);
     }
-  }
+  }, [markSynced]);
 
   useEffect(() => {
     const pollId = setInterval(() => {
@@ -162,8 +179,7 @@ export function ActivityFeed({ initialRows, initialLatestId }: ActivityFeedProps
       clearInterval(tickId);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [intervalMs]);
+  }, [intervalMs, fetchDelta]);
 
   const filteredRows = useMemo(() => {
     if (filter === "all") return rows;

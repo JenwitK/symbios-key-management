@@ -1,0 +1,176 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 14vh;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.16s,
+    visibility 0s linear 0.16s;
+}
+
+.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.16s,
+    visibility 0s linear 0s;
+}
+
+.palette {
+  width: min(620px, calc(100vw - 32px));
+  border-radius: 14px;
+  background: rgba(18, 18, 22, 0.96);
+  border: 1px solid var(--line2);
+  box-shadow:
+    0 40px 100px -20px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  transform: translateY(-8px) scale(0.985);
+  transition: transform 0.2s var(--ease);
+}
+
+.open .palette {
+  transform: none;
+}
+
+.palInput {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 52px;
+  border-bottom: 1px solid var(--line);
+  color: var(--t3);
+}
+
+.palInput input {
+  flex: 1;
+  background: none;
+  border: 0;
+  outline: none;
+  color: var(--t1);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.palInput input::placeholder {
+  color: var(--t4);
+}
+
+.palList {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.palGroup {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t4);
+  padding: var(--space-3) var(--space-2) var(--space-2);
+}
+
+.palItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 38px;
+  padding: 0 var(--space-2);
+  border-radius: 8px;
+  color: var(--t2);
+  font-size: 0.84375rem;
+  cursor: pointer;
+}
+
+.palItem svg {
+  color: var(--t3);
+  flex-shrink: 0;
+}
+
+.palItem span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sel {
+  background: var(--s3);
+  color: var(--t1);
+}
+
+.sel svg {
+  color: var(--t1);
+}
+
+.match {
+  background: none;
+  color: var(--t1);
+  font-weight: 600;
+}
+
+.meta {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--t4);
+  white-space: nowrap;
+}
+
+.palEmpty {
+  padding: var(--space-7);
+  text-align: center;
+  color: var(--t3);
+  font-size: 0.8125rem;
+}
+
+.palFoot {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--line);
+  font-size: 0.71875rem;
+  color: var(--t3);
+}
+
+.palFoot span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 0.65625rem;
+  color: var(--t3);
+  border: 1px solid var(--line2);
+  background: var(--s2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .palette {
+    transition: none;
+  }
+}

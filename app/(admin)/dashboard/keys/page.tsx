@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createClient as createAdminClient } from "@/lib/supabase/admin";
 import { KeysManager, type KeyRow, type ScriptOption } from "./KeysManager";
 
@@ -27,11 +28,13 @@ export default async function KeysPage() {
     (settingsData?.default_reset_limit as number | undefined) ?? 3;
 
   return (
-    <KeysManager
-      keys={keys}
-      scripts={scripts}
-      keyScriptMap={keyScriptMap}
-      defaultResetLimit={defaultResetLimit}
-    />
+    <Suspense>
+      <KeysManager
+        keys={keys}
+        scripts={scripts}
+        keyScriptMap={keyScriptMap}
+        defaultResetLimit={defaultResetLimit}
+      />
+    </Suspense>
   );
 }

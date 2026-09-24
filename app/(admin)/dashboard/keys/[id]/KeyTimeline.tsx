@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/Badge/Badge";
 import { HwidCell } from "@/components/HwidCell/HwidCell";
 import { expiryCountdown } from "@/lib/datetime";
+import { useSetBreadcrumb } from "../../BreadcrumbContext";
 import styles from "./keyDetail.module.css";
 
 export type TimelineRow = {
@@ -71,6 +72,8 @@ export function KeyHeaderCard({
   scripts: ScriptAccess[];
 }) {
   const [copied, setCopied] = useState(false);
+
+  useSetBreadcrumb("Keys", keyRow.key_value);
 
   async function handleCopy() {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Search, LogOut } from "lucide-react";
@@ -50,6 +50,13 @@ export function Sidebar({
   const { openPalette } = useCommandPalette();
   const { open: drawerOpen } = useNavDrawer();
   const { maintenance, toggle, isPending } = useMaintenanceToggle(initialMaintenance);
+  const activeItemRef = useRef<HTMLAnchorElement | null>(null);
+
+  // Scroll the active item into view once, on initial load, so a deep nav
+  // item isn't hidden below the fold on a short window.
+  useEffect(() => {
+    activeItemRef.current?.scrollIntoView({ block: "nearest" });
+  }, []);
 
   const [openGroups, setOpenGroups] = useState<Set<NavGroupKey>>(() => {
     const initial = new Set<NavGroupKey>();
@@ -122,6 +129,7 @@ export function Sidebar({
               <Link
                 key={item.href}
                 href={item.href}
+                ref={active ? activeItemRef : undefined}
                 className={active ? `${styles.navItem} ${styles.navItemActive}` : styles.navItem}
               >
                 <Icon size={16} strokeWidth={1.6} />
@@ -163,6 +171,7 @@ export function Sidebar({
                       <Link
                         key={item.href}
                         href={item.href}
+                        ref={active ? activeItemRef : undefined}
                         className={
                           active ? `${styles.navItem} ${styles.navItemActive}` : styles.navItem
                         }
